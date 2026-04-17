@@ -1,0 +1,262 @@
+// :host representa el componente raíz actual.
+// display: block hace que el componente se comporte como un bloque normal.
+:host {
+  display: block;
+}
+
+// .topbar estiliza toda la barra superior.
+// Se usa un degradado azul, texto blanco y una sombra sutil
+// para darle apariencia de encabezado principal.
+.topbar {
+  background: linear-gradient(135deg, #1565c0, #0d47a1);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(13, 71, 161, 0.25);
+  margin-bottom: 24px;
+}
+
+// .topbar__inner es el contenedor interno de la barra superior.
+// Su función es limitar el ancho y centrar el contenido,
+// de forma que el título quede alineado con las tarjetas.
+.topbar__inner {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+}
+
+// .topbar__title controla el tamaño y peso visual del título principal.
+.topbar__title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+// .contenedor envuelve el contenido principal de la página.
+// Limita el ancho, centra horizontalmente y agrega padding inferior.
+.contenedor {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 16px 32px;
+}
+
+// .bloque agrega separación vertical entre las tarjetas.
+.bloque {
+  margin-bottom: 24px;
+}
+
+// .tarjeta-elevada mejora la apariencia visual de cada mat-card.
+// Se ajustan bordes, sombra, fondo y redondeo.
+.tarjeta-elevada {
+  border-radius: 22px;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  box-shadow:
+    0 14px 30px rgba(15, 23, 42, 0.08),
+    0 4px 10px rgba(15, 23, 42, 0.04);
+  background: rgba(255, 255, 255, 0.92);
+  overflow: hidden;
+}
+
+// Este selector ajusta visualmente el título de las tarjetas.
+mat-card-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+// Este selector suaviza el color del subtítulo de las tarjetas.
+mat-card-subtitle {
+  color: #64748b;
+}
+
+// .form-grid organiza los tres campos del formulario en columnas iguales.
+// CSS Grid resulta muy útil para formularios ordenados.
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+// mat-form-field se fuerza a ocupar todo el ancho disponible dentro de su columna.
+mat-form-field {
+  width: 100%;
+}
+
+// .btn-principal da estilo al botón de agregar.
+// Se usa color azul, texto blanco, forma redondeada y sombra.
+.btn-principal {
+  background: linear-gradient(135deg, #1976d2, #1565c0) !important;
+  color: #ffffff !important;
+  border-radius: 999px;
+  padding: 0 18px;
+  min-height: 44px;
+  box-shadow: 0 8px 18px rgba(25, 118, 210, 0.22);
+  font-weight: 600;
+}
+
+// .chips-resumen separa los chips de resumen respecto a los filtros.
+.chips-resumen {
+  margin-bottom: 18px;
+}
+
+// .chip-resumen da un estilo uniforme a los chips del bloque resumen.
+.chip-resumen {
+  background: #eef4ff !important;
+  color: #1e3a8a !important;
+  border: 1px solid #dbe7ff;
+  font-weight: 600;
+}
+
+// .filtros organiza los botones de filtrado.
+// flex-wrap permite que bajen a otra línea si no caben.
+.filtros {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+// .btn-filtro ajusta la forma visual de los botones de filtro.
+.btn-filtro {
+  border-radius: 999px;
+  min-height: 42px;
+  padding: 0 18px;
+}
+
+// .item-tarea permite que cada tarea crezca según su contenido.
+// Angular Material a veces fija alturas pequeñas en listas.
+.item-tarea {
+  height: auto !important;
+  padding-top: 14px;
+  padding-bottom: 14px;
+}
+
+// .fila-tarea divide el contenido de cada tarea en dos zonas:
+// contenido principal y acciones.
+.fila-tarea {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 18px;
+}
+
+// .lado-izquierdo agrupa checkbox y contenido textual.
+.lado-izquierdo {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  flex: 1;
+}
+
+// .lado-derecho contiene el botón de eliminar.
+.lado-derecho {
+  display: flex;
+  align-items: center;
+}
+
+// .contenido-tarea apila título, materia y chips de cada tarea.
+.contenido-tarea {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 2px;
+}
+
+// .titulo-tarea define el estilo principal del nombre de la tarea.
+.titulo-tarea {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+// .materia-tarea estiliza el texto secundario.
+.materia-tarea {
+  margin: 0;
+  color: #475569;
+  font-size: 0.95rem;
+}
+
+// .tarea-completada se aplica cuando la tarea ya fue marcada como hecha.
+// Se dibuja una línea y se reduce un poco la opacidad.
+.tarea-completada {
+  text-decoration: line-through;
+  opacity: 0.68;
+}
+
+// .sin-datos se usa cuando el filtro no devuelve tareas visibles.
+.sin-datos {
+  margin: 0;
+  padding: 8px 0;
+  color: #64748b;
+  font-style: italic;
+}
+
+// .chip-alta aplica colores para prioridad alta.
+.chip-alta {
+  background-color: #fde8e8 !important;
+  color: #b42318 !important;
+  border: 1px solid #f7caca;
+}
+
+// .chip-media aplica colores para prioridad media.
+.chip-media {
+  background-color: #fff4db !important;
+  color: #9a6700 !important;
+  border: 1px solid #f2dfb0;
+}
+
+// .chip-baja aplica colores para prioridad baja.
+.chip-baja {
+  background-color: #e7f8ee !important;
+  color: #027a48 !important;
+  border: 1px solid #c6ebd2;
+}
+
+// .chip-estado-ok representa una tarea completada.
+.chip-estado-ok {
+  background-color: #e7f8ee !important;
+  color: #027a48 !important;
+  border: 1px solid #c6ebd2;
+}
+
+// .chip-estado-pendiente representa una tarea aún no completada.
+.chip-estado-pendiente {
+  background-color: #eef2f7 !important;
+  color: #475467 !important;
+  border: 1px solid #d8e0ea;
+}
+
+// .btn-eliminar da estilo al botón de eliminar,
+// usando un color asociado a acción destructiva.
+.btn-eliminar {
+  color: #c62828 !important;
+  font-weight: 600;
+}
+
+// mat-divider suaviza la línea divisoria entre tareas.
+mat-divider {
+  opacity: 0.55;
+}
+
+// Diseño responsivo.
+// Cuando la pantalla es más pequeña:
+// - el formulario pasa a una sola columna
+// - las tareas se apilan verticalmente
+@media (max-width: 900px) {
+
+  // En móviles o pantallas medianas el grid del formulario se vuelve de una columna.
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  // Las filas de tarea dejan de ser horizontales y pasan a verticales.
+  .fila-tarea {
+    flex-direction: column;
+  }
+
+  // El lado derecho puede ocupar todo el ancho disponible.
+  .lado-derecho {
+    width: 100%;
+  }
+}

@@ -1,0 +1,37 @@
+// @use importa Angular Material para poder utilizar mixins y tema.
+@use '@angular/material' as mat;
+
+// mat.core() inicializa los estilos base de Angular Material.
+// Debe incluirse una sola vez en toda la aplicación.
+@include mat.core();
+
+// Aquí se define el tema global del proyecto.
+// color-scheme: light indica que trabajaremos con esquema claro.
+html {
+  color-scheme: light;
+
+  // mat.theme configura color, tipografía y densidad.
+  @include mat.theme((
+    color: mat.$blue-palette,
+    typography: Roboto,
+    density: 0
+  ));
+}
+
+// html y body ocupan el 100% de la altura del navegador.
+// margin: 0 elimina el margen por defecto del navegador.
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+// body define la tipografía y el fondo global de toda la aplicación.
+body {
+  font-family: Roboto, Arial, sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(25, 118, 210, 0.10), transparent 28%),
+    radial-gradient(circle at top right, rgba(13, 71, 161, 0.08), transparent 24%),
+    linear-gradient(180deg, #f6f9fc 0%, #eef3f8 100%);
+  color: #0f172a;
+}

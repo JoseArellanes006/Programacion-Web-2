@@ -1,0 +1,349 @@
+<!--
+  Esta es la plantilla principal de la aplicación.
+
+  Aquí se renderizan:
+  - la barra superior
+  - la tarjeta del formulario
+  - la tarjeta de resumen
+  - la tarjeta con la lista de tareas
+
+  Se usan componentes de Angular Material y la sintaxis moderna de Angular.
+-->
+
+<!--
+  Barra superior principal de la aplicación.
+
+  La barra ocupa todo el ancho disponible, pero dentro tiene un contenedor
+  interno para alinear el título con el resto del contenido.
+-->
+<mat-toolbar class="topbar">
+
+  <!--
+    Este contenedor interno centra y limita el ancho del contenido
+    de la barra superior.
+  -->
+  <div class="topbar__inner">
+
+    <!--
+      Aquí se muestra el título principal usando interpolación de Angular.
+    -->
+    <span class="topbar__title">{{ tituloApp }}</span>
+  </div>
+</mat-toolbar>
+
+<!--
+  Contenedor general del contenido principal.
+  Dentro de este bloque viven todas las tarjetas principales.
+-->
+<div class="contenedor">
+
+  <!--
+    ============================================================================
+    TARJETA 1: FORMULARIO DE NUEVA TAREA
+    ============================================================================
+
+    Esta tarjeta contiene el formulario para capturar una nueva tarea.
+  -->
+  <mat-card class="bloque tarjeta-elevada">
+
+    <!-- Encabezado de la tarjeta -->
+    <mat-card-header>
+      <mat-card-title>Nueva tarea</mat-card-title>
+      <mat-card-subtitle>
+        Captura una actividad con su título, materia y prioridad
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <!-- Cuerpo principal de la tarjeta -->
+    <mat-card-content>
+
+      <!--
+        form-grid distribuye los tres controles del formulario en columnas.
+      -->
+      <div class="form-grid">
+
+        <!--
+          Primer campo: título de la tarea.
+
+          mat-form-field crea el contenedor visual Material.
+          mat-label muestra la etiqueta del campo.
+          input matInput aplica estilo Material al input.
+          [(ngModel)] enlaza el valor del input con nuevoTitulo.
+        -->
+        <mat-form-field appearance="outline">
+          <mat-label>Título de la tarea</mat-label>
+          <input
+            matInput
+            [(ngModel)]="nuevoTitulo"
+            placeholder="Ejemplo: Resolver práctica de Angular">
+        </mat-form-field>
+
+        <!--
+          Segundo campo: materia asociada a la tarea.
+          También usa enlace bidireccional con [(ngModel)].
+        -->
+        <mat-form-field appearance="outline">
+          <mat-label>Materia</mat-label>
+          <input
+            matInput
+            [(ngModel)]="nuevaMateria"
+            placeholder="Ejemplo: Programación Web II">
+        </mat-form-field>
+
+        <!--
+          Tercer campo: prioridad.
+
+          mat-select crea un selector desplegable.
+          Cada mat-option representa una opción posible.
+        -->
+        <mat-form-field appearance="outline">
+          <mat-label>Prioridad</mat-label>
+          <mat-select [(ngModel)]="nuevaPrioridad">
+            <mat-option value="Alta">Alta</mat-option>
+            <mat-option value="Media">Media</mat-option>
+            <mat-option value="Baja">Baja</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+      </div>
+    </mat-card-content>
+
+    <!-- Zona de acciones de la tarjeta -->
+    <mat-card-actions>
+
+      <!--
+        Este botón ejecuta agregarTarea() cuando el usuario hace clic.
+        mat-flat-button lo muestra con estilo Material.
+      -->
+      <button mat-flat-button class="btn-principal" (click)="agregarTarea()">
+        <mat-icon>add</mat-icon>
+        Agregar tarea
+      </button>
+    </mat-card-actions>
+  </mat-card>
+
+  <!--
+    ============================================================================
+    TARJETA 2: RESUMEN
+    ============================================================================
+
+    Esta tarjeta muestra indicadores calculados automáticamente con computed().
+  -->
+  <mat-card class="bloque tarjeta-elevada">
+
+    <!-- Encabezado de la tarjeta -->
+    <mat-card-header>
+      <mat-card-title>Resumen</mat-card-title>
+      <mat-card-subtitle>
+        Indicadores automáticos calculados con computed()
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <!-- Contenido de la tarjeta -->
+    <mat-card-content>
+
+      <!--
+        chips-resumen agrupa las etiquetas visuales con los totales.
+      -->
+      <div class="chips-resumen">
+        <mat-chip-set>
+
+          <!-- Muestra el total de tareas -->
+          <mat-chip class="chip-resumen">
+            Total: {{ totalTareas() }}
+          </mat-chip>
+
+          <!-- Muestra el total de tareas pendientes -->
+          <mat-chip class="chip-resumen">
+            Pendientes: {{ totalPendientes() }}
+          </mat-chip>
+
+          <!-- Muestra el total de tareas completadas -->
+          <mat-chip class="chip-resumen">
+            Completadas: {{ totalCompletadas() }}
+          </mat-chip>
+        </mat-chip-set>
+      </div>
+
+      <!--
+        Esta zona contiene los botones de filtro.
+        Cada botón cambia el valor del filtro actual.
+      -->
+      <div class="filtros">
+
+        <!-- Botón para mostrar todas las tareas -->
+        <button
+          mat-stroked-button
+          class="btn-filtro"
+          (click)="cambiarFiltro('todas')">
+          Todas
+        </button>
+
+        <!-- Botón para mostrar solo tareas pendientes -->
+        <button
+          mat-stroked-button
+          class="btn-filtro"
+          (click)="cambiarFiltro('pendientes')">
+          Pendientes
+        </button>
+
+        <!-- Botón para mostrar solo tareas completadas -->
+        <button
+          mat-stroked-button
+          class="btn-filtro"
+          (click)="cambiarFiltro('completadas')">
+          Completadas
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!--
+    ============================================================================
+    TARJETA 3: LISTA DE TAREAS
+    ============================================================================
+
+    Esta tarjeta renderiza dinámicamente las tareas visibles
+    según el filtro actual.
+  -->
+  <mat-card class="bloque tarjeta-elevada">
+
+    <!-- Encabezado de la tarjeta -->
+    <mat-card-header>
+      <mat-card-title>Lista de tareas</mat-card-title>
+      <mat-card-subtitle>
+        Renderizado dinámico con la sintaxis moderna de Angular
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <!-- Contenido principal -->
+    <mat-card-content>
+
+      <!--
+        @if es la sintaxis moderna de Angular para condicionales en plantillas.
+
+        Si la lista filtrada está vacía, se muestra un mensaje.
+      -->
+      @if (tareasFiltradas().length === 0) {
+
+        <p class="sin-datos">
+          No hay tareas para mostrar con el filtro seleccionado.
+        </p>
+
+      } @else {
+
+        <!--
+          Si sí existen tareas visibles, se renderiza la lista.
+        -->
+        <mat-list>
+
+          <!--
+            @for es la sintaxis moderna para iterar listas.
+            track t.id ayuda a Angular a identificar eficientemente cada elemento.
+          -->
+          @for (t of tareasFiltradas(); track t.id) {
+
+            <!--
+              Cada tarea se representa como un mat-list-item.
+            -->
+            <mat-list-item class="item-tarea">
+
+              <!--
+                fila-tarea divide cada elemento en dos zonas:
+                lado izquierdo = checkbox + contenido
+                lado derecho   = botón eliminar
+              -->
+              <div class="fila-tarea">
+
+                <!-- Zona izquierda -->
+                <div class="lado-izquierdo">
+
+                  <!--
+                    Checkbox para marcar la tarea como completada o pendiente.
+
+                    [checked] enlaza el estado visual con t.completada.
+                    (change) ejecuta toggleTarea() cuando se cambia.
+                  -->
+                  <mat-checkbox
+                    [checked]="t.completada"
+                    (change)="toggleTarea(t.id)">
+                  </mat-checkbox>
+
+                  <!--
+                    Este bloque agrupa título, materia y chips de la tarea.
+                  -->
+                  <div class="contenido-tarea">
+
+                    <!--
+                      Título de la tarea.
+
+                      [class.tarea-completada]="t.completada"
+                      aplica una clase condicional cuando la tarea está completada.
+                    -->
+                    <p
+                      class="titulo-tarea"
+                      [class.tarea-completada]="t.completada">
+                      {{ t.titulo }}
+                    </p>
+
+                    <!-- Muestra la materia asociada -->
+                    <p class="materia-tarea">
+                      Materia: {{ t.materia }}
+                    </p>
+
+                    <!--
+                      Conjunto de chips que muestran prioridad y estado.
+                    -->
+                    <mat-chip-set>
+
+                      <!--
+                        Chip de prioridad.
+                        La clase CSS se decide con obtenerClasePrioridad().
+                      -->
+                      <mat-chip [class]="obtenerClasePrioridad(t.prioridad)">
+                        Prioridad: {{ t.prioridad }}
+                      </mat-chip>
+
+                      <!--
+                        Según el estado de la tarea, se muestra un chip distinto.
+                      -->
+                      @if (t.completada) {
+                        <mat-chip class="chip-estado-ok">
+                          Completada
+                        </mat-chip>
+                      } @else {
+                        <mat-chip class="chip-estado-pendiente">
+                          Pendiente
+                        </mat-chip>
+                      }
+                    </mat-chip-set>
+                  </div>
+                </div>
+
+                <!-- Zona derecha -->
+                <div class="lado-derecho">
+
+                  <!--
+                    Botón para eliminar la tarea actual.
+                  -->
+                  <button
+                    mat-button
+                    class="btn-eliminar"
+                    (click)="eliminarTarea(t.id)">
+                    <mat-icon>delete</mat-icon>
+                    Eliminar
+                  </button>
+                </div>
+              </div>
+            </mat-list-item>
+
+            <!--
+              Línea divisoria entre una tarea y otra.
+            -->
+            <mat-divider></mat-divider>
+          }
+        </mat-list>
+      }
+    </mat-card-content>
+  </mat-card>
+</div>
