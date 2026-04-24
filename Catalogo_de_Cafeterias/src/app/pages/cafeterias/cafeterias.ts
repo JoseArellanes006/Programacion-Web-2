@@ -6,10 +6,21 @@ import { CafeteriasService } from '../../services/cafeterias';
 
 /*
   Esta es la página principal del catálogo.
-  Su responsabilidad es:
-  - cargar los datos al iniciar
-  - mostrar encabezado
-  - integrar buscador, filtro y lista
+
+  Su papel es coordinar visualmente:
+  - encabezado principal
+  - buscador
+  - filtro
+  - lista de cafeterías
+
+  También se encarga de pedir la carga inicial de los datos.
+
+  En términos del tema de clase, esta página integra:
+  - diseño móvil
+  - interacción
+  - transición visual
+  - organización de contenido
+  - enfoque en experiencia de usuario
 */
 @Component({
   selector: 'app-cafeterias',
@@ -50,10 +61,12 @@ import { CafeteriasService } from '../../services/cafeterias';
       margin: 0 auto;
       padding: 16px;
       box-sizing: border-box;
+      animation: fadePage 0.35s ease;
     }
 
     .hero {
       padding: 12px 4px 20px 4px;
+      animation: slideHero 0.4s ease;
     }
 
     .eyebrow {
@@ -99,6 +112,26 @@ import { CafeteriasService } from '../../services/cafeterias';
         align-items: end;
       }
     }
+
+    @keyframes fadePage {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideHero {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
   `]
 })
 export class CafeteriasComponent implements OnInit {
@@ -106,6 +139,7 @@ export class CafeteriasComponent implements OnInit {
 
   /*
     Al entrar a la página, se realiza la carga inicial de cafeterías.
+    Esto permite que la interfaz muestre contenido desde el inicio.
   */
   ngOnInit(): void {
     this.cafeteriasService.obtenerCafeterias();

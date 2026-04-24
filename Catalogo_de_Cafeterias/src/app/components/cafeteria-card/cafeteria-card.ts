@@ -3,13 +3,26 @@ import { Router } from '@angular/router';
 import { Cafeteria } from '../../models/cafeteria.model';
 
 /*
-  Esta tarjeta representa una cafetería dentro del catálogo.
+  Esta tarjeta representa una cafetería individual dentro del catálogo.
 
-  Muestra información resumida y permite navegar a la vista de detalle.
-  Visualmente está pensada para una experiencia móvil:
-  - tarjeta grande
-  - imagen destacada
-  - pulsación con transición
+  Pedagógicamente, este componente es muy valioso porque permite mostrar:
+
+  1. Interacción táctil:
+     El usuario puede tocar la tarjeta completa o el botón.
+
+  2. Transiciones móviles:
+     - scale al presionar
+     - elevación visual con sombra
+     - animación de entrada tipo fade + slide
+
+  3. Retroalimentación visual:
+     - el botón cambia al presionarse
+     - la tarjeta responde visualmente al tacto
+
+  4. UX móvil:
+     - la tarjeta es amplia
+     - la información está jerarquizada
+     - el contenido se entiende rápido en pantalla pequeña
 */
 @Component({
   selector: 'app-cafeteria-card',
@@ -52,8 +65,16 @@ import { Cafeteria } from '../../models/cafeteria.model';
       border-radius: 22px;
       overflow: hidden;
       box-shadow: 0 10px 24px rgba(67, 44, 25, 0.08);
-      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        opacity 0.25s ease;
       cursor: pointer;
+      animation: cardEntrance 0.45s ease;
+    }
+
+    .card:hover {
+      box-shadow: 0 14px 30px rgba(67, 44, 25, 0.12);
     }
 
     .card:active {
@@ -73,6 +94,11 @@ import { Cafeteria } from '../../models/cafeteria.model';
       height: 100%;
       object-fit: cover;
       display: block;
+      transition: transform 0.35s ease;
+    }
+
+    .card:hover .imagen {
+      transform: scale(1.03);
     }
 
     .badge {
@@ -150,12 +176,32 @@ import { Cafeteria } from '../../models/cafeteria.model';
       border-radius: 12px;
       font-size: 0.92rem;
       font-weight: 600;
-      transition: transform 0.2s ease, background 0.2s ease;
+      transition:
+        transform 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease;
+      min-height: 42px;
+    }
+
+    .boton:hover {
+      background: #5f4029;
+      box-shadow: 0 6px 14px rgba(111, 74, 47, 0.22);
     }
 
     .boton:active {
       transform: scale(0.97);
       background: #5b3c25;
+    }
+
+    @keyframes cardEntrance {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
   `]
 })
@@ -166,8 +212,10 @@ export class CafeteriaCardComponent {
 
   /*
     Navega a la pantalla de detalle.
-    Recibe event opcional para evitar que el botón interno dispare dos veces
-    la misma navegación al propagarse el click hacia la tarjeta.
+
+    Si el usuario presiona el botón interno, se detiene la propagación
+    del evento para evitar que el click del botón dispare también
+    el click del contenedor principal.
   */
   irADetalle(event?: Event): void {
     event?.stopPropagation();

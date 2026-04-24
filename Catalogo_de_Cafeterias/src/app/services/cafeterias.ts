@@ -3,17 +3,17 @@ import { HttpClient } from '@angular/common/http';
 import { Cafeteria } from '../models/cafeteria.model';
 
 /*
-  Este servicio concentra la lógica principal del catálogo de cafeterías.
+  Este servicio centraliza la lógica principal del catálogo.
 
-  Sus responsabilidades son:
-  - comunicarse con el backend FastAPI
-  - almacenar la lista original recibida del servidor
-  - manejar el estado de búsqueda y filtrado
-  - exponer una lista derivada ya filtrada para la interfaz
-  - manejar estados auxiliares como carga y error
+  Aquí se maneja:
+  - la comunicación con el backend
+  - la lista original de cafeterías
+  - el texto de búsqueda
+  - el filtro por categoría
+  - los estados de carga y error
 
-  La idea de centralizar esta lógica aquí es mantener los componentes
-  más limpios y enfocados únicamente en la vista y la interacción.
+  La intención es que los componentes visuales sean más simples
+  y que la lógica de datos viva en un solo lugar.
 */
 @Injectable({
   providedIn: 'root'
@@ -28,60 +28,43 @@ export class CafeteriasService {
   /*
     URL base del backend.
 
-    IMPORTANTE:
-    - No debe apuntar a localhost ni a 127.0.0.1 si quieres probar
-      desde un celular.
-    - Debe apuntar a la IP local de la computadora donde corre FastAPI.
-
-    Ejemplo:
-    http://192.168.7.76:8000/cafeterias
-
-    Si tu IP cambia, también deberás actualizar esta ruta.
+    Angular consume directamente el backend FastAPI en local.
   */
-  private apiUrl = 'http://192.168.7.76:8000/cafeterias';
+  private apiUrl = 'http://127.0.0.1:8000/api/cafeterias';
 
   /*
-    Signal privada que almacena la lista original tal como llega del backend.
-
-    Se mantiene privada para que la modificación de datos esté controlada
-    desde este mismo servicio.
+    Signal privada que guarda la lista original recibida del backend.
+    Se mantiene privada para controlar mejor su modificación.
   */
   private cafeteriasOriginales = signal<Cafeteria[]>([]);
 
   /*
-    Texto ingresado por el usuario en el buscador.
-    Se usa para aplicar filtrado reactivo en tiempo real.
+    Texto ingresado en el buscador.
+    Se usa para filtrar la lista de forma reactiva.
   */
   textoBusqueda = signal<string>('');
 
   /*
-    Categoría seleccionada por el usuario.
-    También participa en el filtrado reactivo.
+    Categoría actualmente seleccionada en el filtro.
   */
   categoriaSeleccionada = signal<string>('');
 
   /*
-    Estado que indica si actualmente se está realizando una petición
-    al backend. Esto permite mostrar mensajes de carga en la interfaz.
+    Estado que indica si se está realizando una petición al backend.
+    Sirve para mostrar mensajes o indicadores de carga en la interfaz.
   */
   cargando = signal<boolean>(false);
 
   /*
-    Mensaje de error para mostrar en pantalla en caso de que falle
-    la comunicación con el backend.
+    Mensaje de error en caso de que falle la petición.
   */
   error = signal<string>('');
 
   /*
-    computed() genera una lista derivada automáticamente.
-
-    Esta lista no se llena manualmente; se recalcula sola cuando cambia:
+    Lista derivada que se recalcula automáticamente cuando cambia:
     - la lista original
     - el texto de búsqueda
     - la categoría seleccionada
-
-    Gracias a esto, la vista siempre muestra los datos correctos sin tener
-    que escribir lógica adicional en los componentes.
   */
   cafeteriasFiltradas = computed(() => {
     const lista = this.cafeteriasOriginales();
@@ -89,20 +72,12 @@ export class CafeteriasService {
     const categoria = this.categoriaSeleccionada().trim().toLowerCase();
 
     return lista.filter(cafeteria => {
-      /*
-        Se busca coincidencia de texto en varios campos para que
-        la búsqueda sea más útil para el usuario.
-      */
       const coincideTexto =
         texto === '' ||
         cafeteria.nombre.toLowerCase().includes(texto) ||
         cafeteria.ubicacion.toLowerCase().includes(texto) ||
         cafeteria.descripcion.toLowerCase().includes(texto);
 
-      /*
-        Se compara la categoría seleccionada con la categoría de la cafetería.
-        Si no hay categoría seleccionada, todas pasan este filtro.
-      */
       const coincideCategoria =
         categoria === '' ||
         cafeteria.categoria.toLowerCase() === categoria;
@@ -112,14 +87,7 @@ export class CafeteriasService {
   });
 
   /*
-    Obtiene la lista completa de cafeterías desde el backend.
-
-    Flujo:
-    1. Activa el estado de carga
-    2. Limpia errores previos
-    3. Hace la petición HTTP
-    4. Guarda los datos si todo sale bien
-    5. Si falla, muestra mensaje de error
+    Carga todas las cafeterías desde el backend.
   */
   obtenerCafeterias(): void {
     this.cargando.set(true);
@@ -130,7 +98,8 @@ export class CafeteriasService {
         this.cafeteriasOriginales.set(respuesta);
         this.cargando.set(false);
       },
-      error: () => {
+      error: (err) => {
+        console.error(err);
         this.error.set('No fue posible cargar las cafeterías.');
         this.cargando.set(false);
       }
@@ -138,11 +107,7 @@ export class CafeteriasService {
   }
 
   /*
-    Obtiene una cafetería específica por su identificador.
-
-    Este método no modifica directamente los signals del listado general,
-    porque está pensado para la vista de detalle, donde se consulta
-    una sola cafetería.
+    Obtiene una cafetería específica según su ID.
   */
   obtenerCafeteriaPorId(id: number) {
     return this.http.get<Cafeteria>(`${this.apiUrl}/${id}`);
@@ -150,9 +115,6 @@ export class CafeteriasService {
 
   /*
     Actualiza el texto de búsqueda.
-
-    Al cambiar este signal, Angular recalcula automáticamente
-    cafeteriasFiltradas.
   */
   actualizarBusqueda(texto: string): void {
     this.textoBusqueda.set(texto);
@@ -160,19 +122,13 @@ export class CafeteriasService {
 
   /*
     Actualiza la categoría seleccionada.
-
-    Al cambiar este signal, Angular recalcula automáticamente
-    cafeteriasFiltradas.
   */
   actualizarCategoria(categoria: string): void {
     this.categoriaSeleccionada.set(categoria);
   }
 
   /*
-    Restablece los filtros al estado inicial.
-
-    Este método es útil si después quieres añadir un botón
-    como "Limpiar filtros" o "Mostrar todo".
+    Limpia búsqueda y filtro de categoría.
   */
   limpiarFiltros(): void {
     this.textoBusqueda.set('');

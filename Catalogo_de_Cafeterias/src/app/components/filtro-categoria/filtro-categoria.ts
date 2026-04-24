@@ -2,8 +2,13 @@ import { Component, inject } from '@angular/core';
 import { CafeteriasService } from '../../services/cafeterias';
 
 /*
-  Este componente permite filtrar las cafeterías por categoría.
-  Para fines didácticos, usamos un select simple y claro.
+  Este componente permite seleccionar una categoría para filtrar
+  las cafeterías visibles en el catálogo.
+
+  Desde la perspectiva de clase, muestra:
+  - interacción táctil simple
+  - retroalimentación de foco y presión
+  - diseño funcional para pantallas móviles
 */
 @Component({
   selector: 'app-filtro-categoria',
@@ -32,6 +37,7 @@ import { CafeteriasService } from '../../services/cafeterias';
       display: flex;
       flex-direction: column;
       gap: 6px;
+      animation: fadeSlideIn 0.35s ease;
     }
 
     .label {
@@ -42,6 +48,7 @@ import { CafeteriasService } from '../../services/cafeterias';
 
     .select {
       width: 100%;
+      min-height: 50px;
       border: 1px solid #d8c3b3;
       border-radius: 14px;
       padding: 14px 16px;
@@ -49,17 +56,33 @@ import { CafeteriasService } from '../../services/cafeterias';
       background: #fff;
       color: #2f1f14;
       box-sizing: border-box;
-      transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
+      transition:
+        border-color 0.25s ease,
+        box-shadow 0.25s ease,
+        transform 0.2s ease,
+        background-color 0.25s ease;
     }
 
     .select:focus {
       outline: none;
       border-color: #9e6f4c;
       box-shadow: 0 0 0 4px rgba(158, 111, 76, 0.15);
+      background-color: #fffdfb;
     }
 
     .select:active {
       transform: scale(0.995);
+    }
+
+    @keyframes fadeSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
   `]
 })
@@ -68,6 +91,7 @@ export class FiltroCategoriaComponent {
 
   /*
     Actualiza la categoría seleccionada en el servicio.
+    Al hacerlo, la lista se recalcula automáticamente.
   */
   onFiltrar(event: Event): void {
     const select = event.target as HTMLSelectElement;
