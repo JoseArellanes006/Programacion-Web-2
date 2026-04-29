@@ -1,0 +1,96 @@
+GUÍA DE USUARIO
+SIMULADOR DE PRESUPUESTO PERSONAL INTELIGENTE
+
+--------------------------------------------------
+
+1. CONFIGURACIÓN INICIAL
+
+Al abrir la aplicación, el usuario puede registrar:
+
+- Nombre
+- Moneda de trabajo: MXN, USD o EUR
+
+Después debe presionar "Guardar configuración".
+
+Estos datos se almacenan en el navegador mediante LocalStorage,
+por lo que permanecen incluso si se recarga la página.
+
+--------------------------------------------------
+
+2. REGISTRAR MOVIMIENTOS
+
+En la sección "Registrar movimiento", el usuario puede capturar:
+
+- Tipo: ingreso o gasto
+- Concepto
+- Categoría
+- Monto
+
+Después debe presionar "Agregar movimiento".
+
+Ejemplos:
+
+Ingreso | Salario | Trabajo | 12000
+Gasto   | Renta   | Vivienda | 3500
+Gasto   | Transporte | Movilidad | 900
+
+--------------------------------------------------
+
+3. CONSULTAR RESUMEN
+
+La sección "Resumen del presupuesto" muestra automáticamente:
+
+- Total de ingresos
+- Total de gastos
+- Balance disponible
+- Porcentaje de gasto
+
+Cada vez que se agrega o elimina un movimiento,
+el resumen se actualiza automáticamente.
+
+--------------------------------------------------
+
+4. ADMINISTRAR MOVIMIENTOS
+
+En "Movimientos registrados", el usuario puede:
+
+- Ver todos los ingresos y gastos registrados
+- Eliminar un movimiento individual
+- Limpiar todos los movimientos
+
+Los datos se guardan en LocalStorage.
+
+--------------------------------------------------
+
+5. EJECUTAR SIMULACIÓN FINANCIERA
+
+En "Simulador financiero", el usuario debe capturar:
+
+- Meta de ahorro
+- Reducción de gastos (%)
+- Meses de proyección
+
+Después presiona "Ejecutar simulación".
+
+La aplicación calcula:
+
+- Ahorro mensual actual
+- Ahorro mensual simulado
+- Ahorro proyectado
+- Meses necesarios para alcanzar la meta
+
+El cálculo se realiza usando Web Worker,
+por lo que la interfaz no se bloquea.
+
+--------------------------------------------------
+
+6. HISTORIAL DE SIMULACIONES
+
+Cada simulación realizada se guarda en el historial.
+
+El historial permanece disponible aunque se recargue la página,
+ya que se almacena mediante LocalStorage.
+
+El usuario puede limpiar el historial cuando lo desee.
+
+--------------------------------------------------
