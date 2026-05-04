@@ -19,7 +19,7 @@ por lo que permanecen incluso si se recarga la página.
 
 2. REGISTRAR MOVIMIENTOS
 
-En la sección "Registrar movimiento", el usuario puede capturar:
+En la sección "Registrar movimiento", el usuario puede capturar:	-
 
 - Tipo: ingreso o gasto
 - Concepto
