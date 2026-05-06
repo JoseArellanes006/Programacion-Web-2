@@ -1,29 +1,26 @@
-import { Component, input } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 
 /*
   ConnectionStatusComponent
 
-  Propósito del componente:
-  --------------------------
-  Este componente tiene una responsabilidad muy específica:
-  representar visualmente el estado de conexión del sistema de chat.
+  Este componente muestra y controla visualmente el estado de conexión
+  del chat.
 
-  Contexto dentro de la aplicación:
-  ---------------------------------
-  La aplicación utiliza WebSockets para comunicación en tiempo real.
-  Sin embargo, esta conexión puede fallar o perderse.
+  Antes solo mostraba si el WebSocket estaba conectado o desconectado.
+  Ahora también permite probar modo offline de forma correcta.
 
-  Por eso existen dos estados operativos:
-  - ONLINE (WebSocket activo → mensajes en tiempo real)
-  - OFFLINE (sin conexión → mensajes se almacenan localmente)
+  Responsabilidades:
+  - Mostrar si el cliente está conectado.
+  - Mostrar si está desconectado.
+  - Emitir evento para simular desconexión.
+  - Emitir evento para reconectar.
 
-  Este componente:
-  - NO gestiona la conexión.
-  - NO abre ni cierra sockets.
-  - SOLO refleja el estado que recibe desde un nivel superior (servicio o página).
+  Importante:
+  Este componente NO abre ni cierra WebSockets directamente.
+  Solo emite eventos al componente padre.
 
-  Esto respeta el principio de:
-  → Separación de responsabilidades (UI vs lógica de red).
+  Flujo:
+  ConnectionStatusComponent → ChatComponent → WebSocketService
 */
 
 @Component({
@@ -31,43 +28,38 @@ import { Component, input } from '@angular/core';
   standalone: true,
 
   template: `
-    <!--
-      Contenedor visual del estado de conexión.
-
-      Se usa binding dinámico de clases:
-      - Si NO está conectado → se aplica la clase "offline"
-      - Si está conectado → mantiene el estilo por defecto
-    -->
     <section class="status" [class.offline]="!conectado()">
 
-      <!--
-        Etiqueta descriptiva para el usuario.
-      -->
-      <strong>Estado:</strong>
+      <div class="text">
+        <strong>Estado:</strong>
 
-      <!--
-        Renderizado condicional del mensaje.
-
-        Si conectado() === true:
-          → "Conectado en tiempo real"
-
-        Si conectado() === false:
-          → "Modo offline / desconectado"
-      -->
-      {{ conectado()
+        {{ conectado()
           ? 'Conectado en tiempo real'
           : 'Modo offline / desconectado' }}
+      </div>
+
+      <div class="actions">
+        <button
+          type="button"
+          (click)="desconectar.emit()"
+          [disabled]="!conectado()"
+        >
+          Simular desconexión
+        </button>
+
+        <button
+          type="button"
+          (click)="reconectar.emit()"
+          [disabled]="conectado()"
+        >
+          Reconectar
+        </button>
+      </div>
+
     </section>
   `,
 
   styles: `
-    /*
-      Estilo por defecto (estado ONLINE)
-
-      Representa una conexión activa:
-      - fondo verde suave → estado correcto
-      - texto verde → señal positiva
-    */
     .status {
       margin: 16px 0;
       padding: 14px;
@@ -75,52 +67,69 @@ import { Component, input } from '@angular/core';
       background: #dcfce7;
       color: #166534;
       border: 1px solid #86efac;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
     }
 
-    /*
-      Estilo alterno (estado OFFLINE)
-
-      Se activa dinámicamente con:
-      [class.offline]="!conectado()"
-
-      Representa:
-      - pérdida de conexión
-      - uso de modo offline
-      - almacenamiento temporal de mensajes
-
-      Uso de colores:
-      - rojo suave → advertencia
-      - contraste visual claro para el usuario
-    */
     .offline {
       background: #fee2e2;
       color: #991b1b;
       border-color: #fecaca;
+    }
+
+    .text {
+      font-size: 15px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 8px;
+      background: #111827;
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      background: #9ca3af;
+      cursor: not-allowed;
     }
   `
 })
 export class ConnectionStatusComponent {
 
   /*
-    Input reactivo: estado de conexión
+    Estado de conexión recibido desde ChatComponent.
 
-    Características:
-    ----------------
-    - Es un signal de Angular (input())
-    - Proviene del componente padre (ej. ChatComponent)
-    - Representa el estado REAL del WebSocket
+    true:
+    WebSocket conectado.
 
-    Flujo de datos:
-    ----------------
-    WebSocketService → ChatComponent → ConnectionStatusComponent
-
-    Valor esperado:
-    - true  → conexión activa
-    - false → desconectado / offline
-
-    Importante:
-    Este componente NO modifica este valor.
-    Solo lo consume (flujo unidireccional).
+    false:
+    WebSocket desconectado.
   */
   conectado = input<boolean>(false);
+
+  /*
+    Evento para solicitar desconexión manual.
+
+    Este evento lo recibe ChatComponent y lo pasa a WebSocketService.
+  */
+  desconectar = output<void>();
+
+  /*
+    Evento para solicitar reconexión manual.
+
+    Este evento lo recibe ChatComponent y lo pasa a WebSocketService.
+  */
+  reconectar = output<void>();
 }

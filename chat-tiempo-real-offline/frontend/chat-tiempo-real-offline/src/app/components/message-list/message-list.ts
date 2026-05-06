@@ -66,6 +66,7 @@ import { Mensaje } from '../../models/mensaje.model';
         <article
           class="message"
           [class.pending]="mensaje.estado === 'pendiente'"
+          [class.sent]="mensaje.estado === 'enviado'"
         >
 
           <!--
@@ -96,7 +97,19 @@ import { Mensaje } from '../../models/mensaje.model';
             - reconexión automática
           -->
           @if (mensaje.estado === 'pendiente') {
-            <small>Mensaje pendiente por enviar</small>
+            <small class="pending-text">Mensaje pendiente por enviar</small>
+          }
+
+          <!--
+            Indicador de estado enviado:
+
+            Aparece cuando el mensaje ya fue confirmado por el servidor.
+
+            Es importante porque permite comprobar visualmente que un mensaje
+            pendiente fue reenviado y aceptado por el backend.
+          -->
+          @if (mensaje.estado === 'enviado') {
+            <small class="sent-text">Mensaje enviado</small>
           }
 
         </article>
@@ -160,6 +173,17 @@ import { Mensaje } from '../../models/mensaje.model';
     }
 
     /*
+      Estilo especial para mensajes enviados.
+
+      Mantiene un estilo neutro, pero permite diferenciar
+      visualmente mensajes confirmados si después se quiere ampliar.
+    */
+    .sent {
+      background: #f9fafb;
+      border-color: #e5e7eb;
+    }
+
+    /*
       Contenedor de metadatos.
 
       Se usa flex para:
@@ -189,10 +213,22 @@ import { Mensaje } from '../../models/mensaje.model';
       - color más oscuro
       - mayor peso tipográfico
     */
-    small {
+    .pending-text {
       display: block;
       margin-top: 8px;
       color: #92400e;
+      font-weight: 700;
+    }
+
+    /*
+      Indicador de mensaje enviado.
+
+      Se usa verde para indicar confirmación correcta.
+    */
+    .sent-text {
+      display: block;
+      margin-top: 8px;
+      color: #166534;
       font-weight: 700;
     }
   `

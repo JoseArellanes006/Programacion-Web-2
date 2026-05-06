@@ -13,44 +13,26 @@ import { Mensaje } from '../../models/mensaje.model';
 /*
   ChatComponent
 
-  Esta es la página principal del chat.
+  Página principal protegida del chat.
 
-  Es una ruta protegida, por lo tanto solo debe mostrarse cuando el usuario
-  ya inició sesión correctamente.
+  Responsabilidades:
+  - Obtener la sesión del usuario.
+  - Conectar al WebSocket.
+  - Mostrar estado de conexión.
+  - Mostrar mensajes.
+  - Enviar mensajes.
+  - Simular desconexión por cliente.
+  - Reconectar manualmente.
+  - Cerrar sesión.
 
-  Responsabilidades principales:
-  - obtener la sesión del usuario autenticado;
-  - abrir la conexión WebSocket;
-  - mostrar el estado de conexión;
-  - mostrar los mensajes recibidos;
-  - enviar nuevos mensajes;
-  - cerrar sesión;
-  - desconectar el WebSocket al salir de la página.
-
-  Este componente no maneja directamente LocalStorage ni la lógica interna
-  del WebSocket. Para eso utiliza servicios especializados:
-
-  - AuthService:
-    administra sesión, usuario actual y cierre de sesión.
-
-  - WebSocketService:
-    administra conexión en tiempo real, envío, recepción y almacenamiento
-    local de mensajes.
+  Esta página coordina componentes y servicios, pero no contiene
+  la lógica interna del WebSocket.
 */
 
 @Component({
   selector: 'app-chat',
   standalone: true,
 
-  /*
-    Componentes visuales usados por la página.
-
-    Cada componente tiene una responsabilidad específica:
-    - ChatHeaderComponent: muestra usuario y botón de salida.
-    - ConnectionStatusComponent: muestra si el chat está conectado.
-    - MessageListComponent: muestra el historial de mensajes.
-    - MessageInputComponent: captura el texto a enviar.
-  */
   imports: [
     ChatHeaderComponent,
     ConnectionStatusComponent,
@@ -60,6 +42,7 @@ import { Mensaje } from '../../models/mensaje.model';
 
   template: `
     <main class="page">
+
       <app-chat-header
         [usuario]="authService.usuarioActual()"
         (cerrarSesion)="cerrarSesion()"
@@ -67,6 +50,8 @@ import { Mensaje } from '../../models/mensaje.model';
 
       <app-connection-status
         [conectado]="webSocketService.conectado()"
+        (desconectar)="webSocketService.desconectarManual()"
+        (reconectar)="webSocketService.reconectarManual()"
       />
 
       <app-message-list
@@ -76,6 +61,7 @@ import { Mensaje } from '../../models/mensaje.model';
       <app-message-input
         (enviarMensaje)="enviarMensaje($event)"
       />
+
     </main>
   `,
 
@@ -91,39 +77,32 @@ import { Mensaje } from '../../models/mensaje.model';
   `
 })
 export class ChatComponent implements OnInit, OnDestroy {
+
   /*
-    AuthService se deja público porque el template necesita acceder
-    al usuario actual mediante:
+    Servicio de autenticación.
 
-    authService.usuarioActual()
-
-    Este servicio también se usa para cerrar sesión.
+    Se usa para:
+    - obtener usuario actual;
+    - obtener token;
+    - cerrar sesión.
   */
   authService = inject(AuthService);
 
   /*
-    WebSocketService se deja público porque el template necesita acceder a:
+    Servicio WebSocket.
 
-    webSocketService.conectado()
-    webSocketService.mensajes()
-
-    Además, esta página lo usa para:
+    Se usa para:
     - conectar al chat;
     - enviar mensajes;
-    - desconectarse.
+    - mostrar historial;
+    - simular desconexión;
+    - reconectar.
   */
   webSocketService = inject(WebSocketService);
 
   /*
-    ngOnInit se ejecuta automáticamente cuando Angular crea esta página.
-
-    En este punto ya se supone que el usuario está autenticado,
-    porque la ruta /chat está protegida por AuthGuard.
-
-    Flujo:
-    1. Se obtiene el token guardado en la sesión.
-    2. Si existe token, se abre la conexión WebSocket.
-    3. El token se envía al backend para identificar o validar al usuario.
+    Al iniciar la página, se obtiene el token guardado
+    durante el login y se abre la conexión WebSocket.
   */
   ngOnInit(): void {
     const token = this.authService.obtenerToken();
@@ -134,56 +113,22 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   /*
-    Envía un mensaje escrito por el usuario.
+    Envía un nuevo mensaje.
 
-    Este método se ejecuta cuando MessageInputComponent emite
-    el evento enviarMensaje.
-
-    Flujo:
-    1. Se obtiene el usuario autenticado.
-    2. Si no hay usuario, se cancela el proceso.
-    3. Se construye un objeto Mensaje.
-    4. Se envía al WebSocketService.
+    Este método recibe el texto emitido por MessageInputComponent.
   */
   enviarMensaje(texto: string): void {
-    /*
-      Se obtiene el usuario actual desde AuthService.
-
-      Esto permite asociar el mensaje con:
-      - id del usuario;
-      - nombre del usuario.
-    */
     const usuario = this.authService.usuarioActual();
 
-    /*
-      Validación de seguridad.
-
-      Si por algún motivo no existe usuario autenticado,
-      no se debe crear ni enviar el mensaje.
-    */
     if (!usuario) {
       return;
     }
 
     /*
-      Construcción del mensaje.
+      Se construye el mensaje con los datos del usuario actual.
 
-      id:
-      Se genera en el frontend con crypto.randomUUID()
-      para identificar el mensaje de forma única.
-
-      usuarioId y usuarioNombre:
-      Permiten saber quién envió el mensaje.
-
-      texto:
-      Es el contenido capturado desde el input.
-
-      fecha:
-      Se genera en el momento del envío.
-
-      estado:
-      Inicia como "enviado". Si el WebSocket no está disponible,
-      WebSocketService puede convertirlo en "pendiente".
+      estado inicia como "enviado", pero si no hay conexión,
+      WebSocketService lo cambiará a "pendiente".
     */
     const mensaje: Mensaje = {
       id: crypto.randomUUID(),
@@ -194,23 +139,14 @@ export class ChatComponent implements OnInit, OnDestroy {
       estado: 'enviado'
     };
 
-    /*
-      Se delega el envío al WebSocketService.
-
-      El componente no decide si el mensaje se manda al servidor
-      o se guarda como pendiente. Esa responsabilidad pertenece
-      al servicio.
-    */
     this.webSocketService.enviarMensaje(mensaje);
   }
 
   /*
-    Cierra la sesión del usuario.
+    Cierra sesión.
 
-    Flujo:
-    1. Se cierra la conexión WebSocket.
-    2. Se elimina la sesión desde AuthService.
-    3. AuthService redirige al usuario a /login.
+    Primero desconecta el WebSocket y después elimina
+    la sesión del usuario.
   */
   cerrarSesion(): void {
     this.webSocketService.desconectar();
@@ -218,14 +154,10 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   /*
-    ngOnDestroy se ejecuta cuando el usuario abandona esta página
-    o Angular destruye el componente.
+    Al destruir la página se cierra el WebSocket.
 
-    Es importante cerrar la conexión WebSocket para evitar:
-    - conexiones abiertas innecesarias;
-    - consumo de recursos;
-    - mensajes duplicados;
-    - comportamiento inesperado al volver a entrar al chat.
+    Esto evita dejar conexiones abiertas si el usuario abandona
+    la vista del chat.
   */
   ngOnDestroy(): void {
     this.webSocketService.desconectar();

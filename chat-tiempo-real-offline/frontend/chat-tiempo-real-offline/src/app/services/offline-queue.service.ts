@@ -8,23 +8,27 @@ import { LocalStorageService } from './local-storage.service';
   Este servicio implementa una cola de mensajes en modo offline.
 
   Problema que resuelve:
-  En aplicaciones en tiempo real (como chat con WebSockets),
-  si el usuario pierde conexión:
-  - los mensajes no pueden enviarse al servidor;
-  - existe riesgo de pérdida de información.
+  En aplicaciones en tiempo real, como un chat con WebSockets,
+  puede ocurrir que el usuario pierda conexión temporalmente.
 
-  Solución:
-  - Se guarda cada mensaje no enviado en una cola local.
-  - Esta cola se persiste en LocalStorage.
-  - Cuando la conexión se restablece, los mensajes pueden reenviarse.
+  En ese caso:
+  - el mensaje no puede enviarse al servidor;
+  - no debe perderse;
+  - debe almacenarse localmente;
+  - debe reenviarse cuando vuelva la conexión.
 
-  Patrón aplicado:
-  "Offline-first" o "queue-based retry".
+  Este servicio se encarga exclusivamente de administrar esa cola.
 
   Responsabilidades:
   - Mantener una lista reactiva de mensajes pendientes.
-  - Sincronizar esa lista con LocalStorage.
-  - Proveer acceso controlado a la cola.
+  - Guardar esa lista en LocalStorage.
+  - Recuperar mensajes pendientes al recargar la página.
+  - Limpiar la cola cuando los mensajes ya fueron reenviados.
+
+  Importante:
+  Este servicio NO abre WebSockets.
+  Este servicio NO envía mensajes al backend.
+  Solo administra los mensajes pendientes.
 */
 
 @Injectable({
@@ -33,85 +37,88 @@ import { LocalStorageService } from './local-storage.service';
 export class OfflineQueueService {
 
   /*
-    Servicio encargado de persistencia en navegador.
+    Servicio encargado de leer y escribir datos en LocalStorage.
 
-    Se utiliza para:
-    - guardar la cola en LocalStorage;
-    - restaurar la cola al recargar la aplicación.
+    Se usa para que la cola de pendientes no se pierda si:
+    - el usuario recarga la página;
+    - el navegador se cierra;
+    - la conexión se pierde temporalmente.
   */
   private localStorageService = inject(LocalStorageService);
 
-
   /*
-    Signal reactivo que contiene la cola de mensajes pendientes.
+    Signal que almacena los mensajes pendientes.
 
     Inicialización:
-    - Se carga desde LocalStorage al iniciar el servicio.
-    - Esto permite que los mensajes pendientes sobrevivan
-      a recargas de página.
+    Al cargar el servicio, se recuperan los mensajes pendientes
+    previamente guardados en LocalStorage.
 
-    Ventaja:
-    - Cualquier componente que dependa de esta signal se actualiza automáticamente.
+    Esto permite continuar el reenvío aunque la página se haya recargado.
   */
   pendientes = signal<Mensaje[]>(
     this.localStorageService.obtenerPendientes()
   );
 
-
   /*
-    Agrega un nuevo mensaje a la cola de pendientes.
+    Agrega un mensaje a la cola de pendientes.
 
     Flujo:
-    1. Se recibe un mensaje que no pudo enviarse (por falta de conexión).
-    2. Se inserta al inicio de la lista (estrategia LIFO para visibilidad inmediata).
-    3. Se actualiza la signal (estado reactivo).
-    4. Se persiste en LocalStorage.
+    1. Recibe un mensaje que no pudo enviarse.
+    2. Lo agrega al FINAL de la cola.
+    3. Actualiza la signal.
+    4. Guarda la cola actualizada en LocalStorage.
 
-    Nota de diseño:
-    Se agrega al inicio para que los mensajes más recientes
-    sean los primeros visibles en UI si se muestran.
+    Decisión importante:
+    Se agrega al final usando:
 
-    Importante:
-    Este método NO envía el mensaje, solo lo almacena.
+      [...this.pendientes(), mensaje]
+
+    Esto mantiene el orden real de envío.
+
+    Ejemplo:
+    Si el usuario escribió:
+    1. Hola
+    2. ¿Cómo estás?
+    3. Nos vemos
+
+    Se reenviarán en ese mismo orden.
+
+    Antes, si se usaba:
+
+      [mensaje, ...this.pendientes()]
+
+    la cola quedaba invertida y se reenviaba primero el último mensaje.
   */
   agregarPendiente(mensaje: Mensaje): void {
-    const nuevaLista = [mensaje, ...this.pendientes()];
+    const nuevaLista = [...this.pendientes(), mensaje];
 
     this.pendientes.set(nuevaLista);
     this.localStorageService.guardarPendientes(nuevaLista);
   }
 
-
   /*
-    Devuelve la lista actual de mensajes pendientes.
+    Devuelve los mensajes pendientes actuales.
 
     Uso:
-    - Permite a otros servicios (por ejemplo WebSocketService)
-      obtener la cola para intentar reenviarla.
+    WebSocketService llama este método cuando recupera conexión
+    para saber qué mensajes debe reenviar.
 
-    Nota:
-    No se expone directamente la signal, sino su valor,
-    para evitar modificaciones externas no controladas.
+    Se devuelve el valor actual de la signal, no la signal completa.
   */
   obtenerPendientes(): Mensaje[] {
     return this.pendientes();
   }
 
-
   /*
-    Limpia completamente la cola de mensajes pendientes.
+    Limpia la cola de mensajes pendientes.
 
     Flujo:
-    1. Se vacía la signal (estado en memoria).
-    2. Se elimina la persistencia en LocalStorage.
+    1. Vacía la signal en memoria.
+    2. Elimina la cola guardada en LocalStorage.
 
     Uso típico:
-    - Después de reenviar exitosamente todos los mensajes;
-    - En un logout completo;
-    - En reinicio de estado de la aplicación.
-
-    Precaución:
-    Una vez ejecutado, los mensajes no enviados se pierden definitivamente.
+    Se ejecuta cuando WebSocketService ya reenvió todos los mensajes
+    pendientes correctamente.
   */
   limpiarPendientes(): void {
     this.pendientes.set([]);
