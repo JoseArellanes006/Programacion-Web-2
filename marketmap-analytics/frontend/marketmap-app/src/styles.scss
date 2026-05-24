@@ -1,0 +1,321 @@
+// Include theming for Angular Material with `mat.theme()`.
+// This Sass mixin will define CSS variables that are used for styling Angular Material
+// components according to the Material 3 design spec.
+// Learn more about theming and how to use it for your application's
+// custom components at https://material.angular.dev/guide/theming
+@use '@angular/material' as mat;
+
+html {
+  height: 100%;
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$azure-palette,
+        tertiary: mat.$blue-palette,
+      ),
+      typography: Roboto,
+      density: 0,
+    )
+  );
+}
+
+body {
+  // Default the application to a light color theme. This can be changed to
+  // `dark` to enable the dark color theme, or to `light dark` to defer to the
+  // user's system settings.
+  color-scheme: light;
+
+  // Set a default background, font and text colors for the application using
+  // Angular Material's system-level CSS variables. Learn more about these
+  // variables at https://material.angular.dev/guide/system-variables
+  background-color: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-medium);
+
+  // Reset the user agent margin.
+  margin: 0;
+  height: 100%;
+}
+/* You can add global styles to this file, and also import other style files */
+/*
+  Hoja de estilos global de la aplicación.
+
+  Este archivo afecta a todo el proyecto Angular.
+  Aquí se definen:
+  - variables globales
+  - reset básico
+  - estilos reutilizables
+  - clases generales para páginas, tarjetas, botones y formularios
+*/
+
+:root {
+  /*
+    Colores base del sistema.
+  */
+  --color-bg: #f4f6fb;
+  --color-surface: #ffffff;
+  --color-surface-alt: #f8fafc;
+
+  /*
+    Colores principales de identidad visual.
+  */
+  --color-primary: #1e3a8a;
+  --color-primary-soft: #dbeafe;
+  --color-secondary: #0f766e;
+  --color-accent: #f59e0b;
+
+  /*
+    Colores semánticos.
+  */
+  --color-danger: #dc2626;
+  --color-success: #16a34a;
+  --color-warning: #d97706;
+
+  /*
+    Colores de texto y bordes.
+  */
+  --color-text: #111827;
+  --color-text-muted: #64748b;
+  --color-border: #e2e8f0;
+
+  /*
+    Radios reutilizables para bordes.
+  */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+
+  /*
+    Sombras reutilizables.
+  */
+  --shadow-soft: 0 12px 30px rgba(15, 23, 42, 0.08);
+  --shadow-card: 0 18px 45px rgba(15, 23, 42, 0.1);
+
+  /*
+    Fuente principal.
+  */
+  --font-main: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/*
+  Reset básico para que los tamaños incluyan padding y border.
+*/
+* {
+  box-sizing: border-box;
+}
+
+/*
+  Configuración base del documento.
+*/
+html {
+  min-height: 100%;
+  scroll-behavior: smooth;
+}
+
+/*
+  Configuración base del body.
+*/
+body {
+  min-height: 100%;
+  margin: 0;
+  font-family: var(--font-main);
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+/*
+  Hace que los controles de formulario hereden la fuente del sistema.
+*/
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+/*
+  Botones con cursor de interacción.
+*/
+button {
+  cursor: pointer;
+}
+
+/*
+  Enlaces sin decoración por defecto.
+*/
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/*
+  Imágenes responsivas por defecto.
+*/
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/*
+  Clase general para páginas internas.
+*/
+.page {
+  width: 100%;
+  padding: 1.5rem;
+}
+
+/*
+  Encabezado reutilizable para páginas.
+*/
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+/*
+  Título reutilizable para páginas.
+*/
+.page-title {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+/*
+  Subtítulo reutilizable para páginas.
+*/
+.page-subtitle {
+  margin: 0.35rem 0 0;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+/*
+  Tarjeta base reutilizable.
+*/
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+}
+
+/*
+  Contenedor general para campos de formulario.
+*/
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+/*
+  Etiqueta de formulario.
+*/
+.form-label {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+/*
+  Control visual reutilizable para input, select o textarea.
+*/
+.form-control {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+
+  /*
+    Estado visual cuando el campo está enfocado.
+  */
+  &:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.14);
+  }
+}
+
+/*
+  Botón base reutilizable.
+*/
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  font-weight: 700;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+
+  /*
+    Efecto visual sutil al pasar el cursor.
+  */
+  &:hover {
+    transform: translateY(-1px);
+  }
+}
+
+/*
+  Botón principal.
+*/
+.btn-primary {
+  background: var(--color-primary);
+  color: #ffffff;
+  box-shadow: var(--shadow-soft);
+}
+
+/*
+  Botón secundario.
+*/
+.btn-secondary {
+  background: var(--color-secondary);
+  color: #ffffff;
+  box-shadow: var(--shadow-soft);
+}
+
+/*
+  Botón con borde.
+*/
+.btn-outline {
+  background: var(--color-surface);
+  color: var(--color-primary);
+  border-color: var(--color-border);
+}
+
+/*
+  Texto secundario.
+*/
+.text-muted {
+  color: var(--color-text-muted);
+}
+
+/*
+  Ajustes responsivos generales.
+*/
+@media (max-width: 768px) {
+  .page {
+    padding: 1rem;
+  }
+
+  .page-header {
+    flex-direction: column;
+  }
+}

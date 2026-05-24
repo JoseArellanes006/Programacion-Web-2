@@ -1,0 +1,379 @@
+<!--
+  ============================================================
+  VISTA HTML DEL DASHBOARD
+  ============================================================
+
+  Este archivo define lo que el usuario ve en pantalla.
+
+  Aquí se muestra:
+
+  - Barra superior.
+  - Título del dashboard.
+  - Botones de acción.
+  - Tarjetas de resumen.
+  - Gráficas.
+  - Tabla de bitácora.
+
+  Se usa Angular Material para la interfaz visual.
+-->
+
+
+<!--
+  ============================================================
+  TOOLBAR
+  ============================================================
+
+  mat-toolbar crea una barra superior.
+
+  color="primary" aplica el color principal del tema de Angular Material.
+-->
+
+<mat-toolbar color="primary" class="toolbar">
+  <span>Sistema Web de Monitoreo de Sensor Infrarrojo</span>
+</mat-toolbar>
+
+
+<!--
+  ============================================================
+  CONTENEDOR PRINCIPAL
+  ============================================================
+
+  Todo el contenido del dashboard está dentro de main.
+-->
+
+<main class="dashboard-container">
+
+
+  <!--
+    ============================================================
+    ENCABEZADO DEL DASHBOARD
+    ============================================================
+
+    Incluye:
+    - Título.
+    - Descripción.
+    - Botones para actualizar y limpiar bitácora.
+  -->
+
+  <section class="header-section">
+    <div>
+      <h1>Dashboard del Sensor Infrarrojo</h1>
+      <p>
+        Visualización de eventos enviados por una ESP32 mediante HTTP.
+      </p>
+    </div>
+
+    <div class="actions">
+      <button mat-raised-button color="primary" (click)="cargarDatos()">
+        <mat-icon>refresh</mat-icon>
+        Actualizar
+      </button>
+
+      <button mat-raised-button color="warn" (click)="limpiarBitacora()">
+        <mat-icon>delete</mat-icon>
+        Limpiar bitácora
+      </button>
+    </div>
+  </section>
+
+
+  <!--
+    ============================================================
+    MENSAJE DE ERROR
+    ============================================================
+
+    @if es la nueva sintaxis de control de flujo en Angular moderno.
+
+    Si error() tiene texto, se muestra la tarjeta de error.
+  -->
+
+  @if (error()) {
+    <mat-card class="error-card">
+      <mat-card-content>
+        {{ error() }}
+      </mat-card-content>
+    </mat-card>
+  }
+
+
+  <!--
+    ============================================================
+    TARJETAS DE RESUMEN
+    ============================================================
+
+    Estas tarjetas muestran datos rápidos del sistema.
+
+    Los datos vienen del signal resumen().
+  -->
+
+  <section class="summary-grid">
+
+    <mat-card class="summary-card">
+      <mat-card-header>
+        <mat-card-title>Total de eventos</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <strong>{{ resumen().total_eventos }}</strong>
+        <span>registros en bitácora</span>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="summary-card success">
+      <mat-card-header>
+        <mat-card-title>Detecciones</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <strong>{{ resumen().total_detectados }}</strong>
+        <span>eventos detectados</span>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="summary-card neutral">
+      <mat-card-header>
+        <mat-card-title>No detectados</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <strong>{{ resumen().total_no_detectados }}</strong>
+        <span>eventos sin detección</span>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="summary-card percent">
+      <mat-card-header>
+        <mat-card-title>Porcentaje</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <strong>{{ porcentajeDeteccion() }}%</strong>
+        <span>detección registrada</span>
+      </mat-card-content>
+    </mat-card>
+
+  </section>
+
+
+  <!--
+    ============================================================
+    SECCIÓN DE GRÁFICAS
+    ============================================================
+
+    Cada gráfica usa un canvas.
+
+    Chart.js se encarga de dibujar dentro del canvas desde TypeScript.
+  -->
+
+  <section class="charts-grid">
+
+
+    <!--
+      ============================================================
+      GRÁFICA DE LÍNEA
+      ============================================================
+
+      Esta es la gráfica principal.
+
+      Muestra cuántas detecciones ocurrieron durante cada minuto.
+
+      Permite observar subidas y caídas en el tiempo.
+    -->
+
+    <mat-card class="chart-card chart-wide">
+      <mat-card-header>
+        <mat-card-title>Detecciones por minuto</mat-card-title>
+        <mat-card-subtitle>
+          Esta gráfica muestra subidas y caídas de detecciones con respecto al tiempo.
+        </mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="chart-container large">
+          <canvas #graficaLinea></canvas>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+
+    <!--
+      ============================================================
+      GRÁFICA DE BARRAS
+      ============================================================
+
+      Compara la cantidad de eventos detectados contra los no detectados.
+    -->
+
+    <mat-card class="chart-card">
+      <mat-card-header>
+        <mat-card-title>Detectado vs No detectado</mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="chart-container">
+          <canvas #graficaBarras></canvas>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+
+    <!--
+      ============================================================
+      GRÁFICA DE DONA
+      ============================================================
+
+      Muestra la proporción visual entre detectado y no detectado.
+    -->
+
+    <mat-card class="chart-card">
+      <mat-card-header>
+        <mat-card-title>Distribución de estados</mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="chart-container">
+          <canvas #graficaDona></canvas>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+  </section>
+
+
+  <!--
+    ============================================================
+    TABLA DE BITÁCORA
+    ============================================================
+
+    Esta tabla muestra todos los eventos recibidos desde la ESP32.
+
+    Se usa mat-table de Angular Material.
+  -->
+
+  <mat-card class="table-card">
+    <mat-card-header>
+      <mat-card-title>Bitácora de eventos</mat-card-title>
+      <mat-card-subtitle>
+        Registros recibidos desde la ESP32.
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+
+
+      <!--
+        ============================================================
+        INDICADOR DE CARGA
+        ============================================================
+
+        Se muestra mientras cargando() sea true.
+      -->
+
+      @if (cargando()) {
+        <div class="loading">
+          <mat-spinner diameter="36"></mat-spinner>
+          <span>Cargando información...</span>
+        </div>
+      }
+
+
+      <!--
+        ============================================================
+        TABLA
+        ============================================================
+
+        [dataSource]="eventos()" indica que la tabla toma sus datos
+        del signal eventos.
+      -->
+
+      <div class="table-wrapper">
+        <table mat-table [dataSource]="eventos()" class="events-table">
+
+
+          <!-- COLUMNA ID -->
+
+          <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef>ID</th>
+            <td mat-cell *matCellDef="let evento">{{ evento.id }}</td>
+          </ng-container>
+
+
+          <!-- COLUMNA FECHA -->
+
+          <ng-container matColumnDef="fecha">
+            <th mat-header-cell *matHeaderCellDef>Fecha</th>
+            <td mat-cell *matCellDef="let evento">{{ evento.fecha }}</td>
+          </ng-container>
+
+
+          <!-- COLUMNA HORA -->
+
+          <ng-container matColumnDef="hora">
+            <th mat-header-cell *matHeaderCellDef>Hora</th>
+            <td mat-cell *matCellDef="let evento">{{ evento.hora }}</td>
+          </ng-container>
+
+
+          <!-- COLUMNA UNIDAD -->
+
+          <ng-container matColumnDef="unidad">
+            <th mat-header-cell *matHeaderCellDef>Unidad</th>
+            <td mat-cell *matCellDef="let evento">{{ evento.unidad }}</td>
+          </ng-container>
+
+
+          <!-- COLUMNA SENSOR -->
+
+          <ng-container matColumnDef="sensor">
+            <th mat-header-cell *matHeaderCellDef>Sensor</th>
+            <td mat-cell *matCellDef="let evento">{{ evento.sensor }}</td>
+          </ng-container>
+
+
+          <!-- COLUMNA ESTADO -->
+
+          <ng-container matColumnDef="estado">
+            <th mat-header-cell *matHeaderCellDef>Estado</th>
+            <td mat-cell *matCellDef="let evento">
+
+              @if (evento.detectado) {
+                <mat-chip class="chip-detectado">Detectado</mat-chip>
+              } @else {
+                <mat-chip class="chip-no-detectado">No detectado</mat-chip>
+              }
+
+            </td>
+          </ng-container>
+
+
+          <!--
+            Fila de encabezado.
+          -->
+
+          <tr mat-header-row *matHeaderRowDef="columnasTabla"></tr>
+
+
+          <!--
+            Filas de datos.
+          -->
+
+          <tr mat-row *matRowDef="let row; columns: columnasTabla;"></tr>
+
+        </table>
+      </div>
+
+
+      <!--
+        ============================================================
+        ESTADO VACÍO
+        ============================================================
+
+        Se muestra cuando no hay eventos registrados.
+      -->
+
+      @if (eventos().length === 0 && !cargando()) {
+        <div class="empty-state">
+          No hay eventos registrados todavía.
+        </div>
+      }
+
+    </mat-card-content>
+  </mat-card>
+
+</main>

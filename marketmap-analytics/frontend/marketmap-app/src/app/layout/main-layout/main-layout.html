@@ -1,0 +1,57 @@
+<!--
+  Layout principal del sistema.
+
+  Se divide en:
+  - contenedor Material
+  - sidebar lateral
+  - contenido principal
+  - navbar superior
+  - contenido dinámico mediante RouterOutlet
+-->
+
+<mat-sidenav-container class="main-layout">
+  <!--
+    Sidebar lateral.
+
+    Se usa mat-sidenav en modo side para mantener el menú visible
+    en pantallas de escritorio.
+  -->
+  <mat-sidenav
+    class="main-layout__sidenav"
+    mode="side"
+    opened
+  >
+    <app-sidebar />
+  </mat-sidenav>
+
+  <!--
+    Contenido principal del sistema.
+  -->
+  <mat-sidenav-content class="main-layout__content">
+    <!--
+      Navbar superior.
+
+      Muestra:
+      - título contextual
+      - notificaciones
+      - usuario actual
+      - menú de sesión
+    -->
+    <app-navbar />
+
+    <!--
+      Área donde Angular cargará las páginas hijas.
+
+      Ejemplo:
+      - dashboard
+      - products
+      - catalog
+      - cart
+      - orders
+      - reports
+    -->
+    <main class="main-layout__page">
+      <router-outlet />
+    </main>
+  </mat-sidenav-content>
+</mat-sidenav-container>

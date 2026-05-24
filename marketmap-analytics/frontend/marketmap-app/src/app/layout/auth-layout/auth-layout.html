@@ -1,0 +1,55 @@
+<!--
+  Layout para pantallas de autenticación.
+
+  Este diseño divide la pantalla en dos zonas:
+  - panel informativo del sistema
+  - panel donde se renderizan login, registro o recuperación de contraseña
+-->
+
+<main class="auth-layout">
+  <!--
+    Panel visual con información del sistema.
+  -->
+  <section class="auth-layout__brand">
+    <div class="auth-layout__brand-card">
+      <span class="auth-layout__eyebrow">
+        Sistema comercial
+      </span>
+
+      <h1>{{ appName() }}</h1>
+
+      <p>
+        {{ appSubtitle() }}
+      </p>
+
+      <!--
+        Características principales del sistema.
+
+        Se usan íconos de Angular Material para dar mayor claridad visual.
+      -->
+      <div class="auth-layout__features">
+        @for (feature of features(); track feature.label) {
+          <span>
+            <mat-icon>{{ feature.icon }}</mat-icon>
+            {{ feature.label }}
+          </span>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!--
+    Panel de contenido.
+
+    Aquí Angular cargará:
+    - login
+    - register
+    - forgot-password
+    - reset-password
+  -->
+  <section class="auth-layout__content">
+    <mat-card class="auth-layout__form-card">
+      <router-outlet />
+    </mat-card>
+  </section>
+</main>

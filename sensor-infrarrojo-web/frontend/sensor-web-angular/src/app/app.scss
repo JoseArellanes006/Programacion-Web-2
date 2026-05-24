@@ -1,0 +1,15 @@
+/*
+  ============================================================
+  ESTILOS DEL COMPONENTE RAÍZ
+  ============================================================
+
+  :host representa al componente actual.
+
+  min-height: 100vh hace que la aplicación ocupe al menos
+  toda la altura visible del navegador.
+*/
+
+:host {
+  display: block;
+  min-height: 100vh;
+}

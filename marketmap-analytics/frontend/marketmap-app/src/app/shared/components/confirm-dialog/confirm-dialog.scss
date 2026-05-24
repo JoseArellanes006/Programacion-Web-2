@@ -1,0 +1,122 @@
+/*
+  Estilos del diálogo de confirmación.
+
+  Usa Angular Material de forma controlada:
+  - mat-card para el panel
+  - mat-icon para el ícono
+  - mat-button para acciones
+
+  El componente conserva diseño propio del sistema.
+*/
+
+.confirm-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 110;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+
+.confirm-dialog__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.58);
+  backdrop-filter: blur(4px);
+}
+
+.confirm-dialog__panel {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 460px);
+  padding: 1.35rem;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+  color: var(--color-text);
+  overflow: hidden;
+}
+
+/*
+  Limpieza visual de mat-card.
+*/
+:host ::ng-deep .confirm-dialog__panel.mat-mdc-card {
+  box-shadow: var(--shadow-card);
+}
+
+.confirm-dialog__header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.confirm-dialog__icon {
+  width: 46px;
+  height: 46px;
+  border-radius: var(--radius-md);
+  display: grid;
+  place-items: center;
+  flex: 0 0 46px;
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+
+  mat-icon {
+    width: 24px;
+    height: 24px;
+    font-size: 24px;
+    line-height: 24px;
+  }
+}
+
+.confirm-dialog__icon--danger {
+  background: #fee2e2;
+  color: var(--color-danger);
+}
+
+.confirm-dialog__title-group {
+  min-width: 0;
+
+  h2 {
+    margin: 0;
+    color: var(--color-text);
+    font-size: 1.22rem;
+    font-weight: 900;
+    line-height: 1.25;
+  }
+
+  p {
+    margin: 0.65rem 0 0;
+    color: var(--color-text-muted);
+    line-height: 1.6;
+  }
+}
+
+.confirm-dialog__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.35rem;
+
+  button {
+    font-weight: 800;
+  }
+}
+
+@media (max-width: 560px) {
+  .confirm-dialog__panel {
+    padding: 1.15rem;
+  }
+
+  .confirm-dialog__header {
+    flex-direction: column;
+  }
+
+  .confirm-dialog__footer {
+    flex-direction: column-reverse;
+
+    button {
+      width: 100%;
+    }
+  }
+}

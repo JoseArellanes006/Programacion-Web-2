@@ -1,0 +1,80 @@
+<!--
+  Componente de carga de archivos.
+
+  Este componente no sube archivos directamente al backend.
+  Solo valida, previsualiza y emite el archivo seleccionado.
+-->
+
+<section
+  class="file-upload"
+  [class.file-upload--disabled]="disabled"
+  (dragover)="handleDragOver($event)"
+  (dragleave)="handleDragLeave($event)"
+  (drop)="handleDrop($event)"
+>
+  <div class="file-upload__header">
+    <label class="file-upload__label">
+      {{ label }}
+    </label>
+
+    <p class="file-upload__helper">
+      {{ helperText }}
+    </p>
+  </div>
+
+  <label
+    class="file-upload__dropzone"
+    [class.file-upload__dropzone--active]="dragging()"
+  >
+    <input
+      type="file"
+      [accept]="accept"
+      [disabled]="disabled"
+      (change)="handleInputChange($event)"
+    />
+
+    <span class="file-upload__icon">
+      <mat-icon>cloud_upload</mat-icon>
+    </span>
+
+    <strong>Seleccionar imagen</strong>
+
+    <small>
+      O arrastre el archivo aquí
+    </small>
+  </label>
+
+  @if (errorMessage()) {
+    <mat-card class="file-upload__error">
+      <mat-icon>error_outline</mat-icon>
+      <span>{{ errorMessage() }}</span>
+    </mat-card>
+  }
+
+  @if (selectedFile()) {
+    <mat-card class="file-upload__preview">
+      @if (previewUrl()) {
+        <img
+          [src]="previewUrl()"
+          alt="Vista previa del archivo"
+        />
+      }
+
+      <div class="file-upload__preview-info">
+        <strong>{{ selectedFile()?.name }}</strong>
+        <span>{{ getFileSize(selectedFile()!) }}</span>
+      </div>
+
+      <button
+        mat-stroked-button
+        color="warn"
+        type="button"
+        [disabled]="disabled"
+        (click)="clearFile()"
+      >
+        <mat-icon>delete</mat-icon>
+        Quitar
+      </button>
+    </mat-card>
+  }
+</section>

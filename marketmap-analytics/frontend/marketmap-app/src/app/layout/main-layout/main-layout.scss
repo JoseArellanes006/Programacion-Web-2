@@ -1,0 +1,205 @@
+/*
+  Estilos del layout principal.
+
+  Este layout usa Angular Material como estructura base mediante:
+  - mat-sidenav-container
+  - mat-sidenav
+  - mat-sidenav-content
+
+  Objetivo:
+  - Evitar scroll horizontal.
+  - Evitar doble scroll vertical.
+  - Permitir que solo el área de páginas tenga scroll.
+*/
+
+.main-layout {
+  /*
+    Ocupa exactamente el alto del viewport.
+  */
+  width: 100%;
+  height: 100vh;
+
+  /*
+    Evita scroll horizontal o vertical del contenedor principal.
+  */
+  overflow: hidden;
+
+  /*
+    Fondo general del sistema.
+  */
+  background: var(--color-background);
+}
+
+/*
+  Contenedor lateral del sidebar.
+*/
+.main-layout__sidenav {
+  /*
+    Ancho fijo del menú lateral.
+  */
+  width: 280px;
+
+  /*
+    Ocupa todo el alto del mat-sidenav-container.
+  */
+  height: 100%;
+
+  /*
+    Borde lateral del menú.
+  */
+  border-right: 1px solid var(--color-border);
+
+  /*
+    Fondo consistente con el sidebar.
+  */
+  background: var(--color-sidebar, var(--color-surface));
+
+  /*
+    Evita scroll horizontal dentro del sidenav.
+  */
+  overflow: hidden;
+
+  /*
+    Evita que bordes provoquen desbordes.
+  */
+  box-sizing: border-box;
+}
+
+/*
+  Contenido principal del sistema.
+*/
+.main-layout__content {
+  /*
+    Ocupa todo el alto del viewport.
+  */
+  height: 100vh;
+
+  /*
+    Distribución vertical:
+    - navbar arriba
+    - página abajo
+  */
+  display: flex;
+  flex-direction: column;
+
+  /*
+    Evita scroll horizontal y doble scroll vertical.
+  */
+  overflow: hidden;
+
+  /*
+    Necesario para evitar desbordes en flex.
+  */
+  min-width: 0;
+
+  /*
+    Fondo de las páginas internas.
+  */
+  background: var(--color-background);
+}
+
+/*
+  Área donde se renderizan las páginas hijas.
+*/
+.main-layout__page {
+  /*
+    Ocupa todo el espacio restante después del navbar.
+  */
+  flex: 1;
+
+  /*
+    Esta debe ser la única zona con scroll vertical.
+  */
+  overflow-y: auto;
+
+  /*
+    Evita scroll horizontal.
+  */
+  overflow-x: hidden;
+
+  /*
+    Espaciado general de páginas.
+  */
+  padding: 1.5rem;
+
+  /*
+    Necesario para evitar desbordes horizontales en contenido interno.
+  */
+  min-width: 0;
+
+  /*
+    Necesario para que flex permita que esta sección se reduzca.
+  */
+  min-height: 0;
+
+  /*
+    Evita que padding genere ancho extra.
+  */
+  box-sizing: border-box;
+}
+
+/*
+  Ajustes internos de Angular Material.
+*/
+:host ::ng-deep .mat-drawer-inner-container {
+  /*
+    El sidebar se encarga de su propia distribución.
+  */
+  height: 100%;
+
+  /*
+    Evita scroll horizontal interno de Material.
+  */
+  overflow-x: hidden;
+
+  /*
+    Evita doble scroll vertical del contenedor interno.
+  */
+  overflow-y: hidden;
+}
+
+:host ::ng-deep .mat-drawer-content {
+  /*
+    Evita scroll del contenedor de Material.
+    El scroll debe estar en main-layout__page.
+  */
+  overflow: hidden;
+
+  /*
+    Necesario para layouts flex internos.
+  */
+  min-width: 0;
+}
+
+:host ::ng-deep .mat-drawer-container {
+  /*
+    Evita scroll externo del contenedor Material.
+  */
+  overflow: hidden;
+}
+
+/*
+  Responsivo para pantallas medianas.
+*/
+@media (max-width: 1024px) {
+  .main-layout__sidenav {
+    width: 240px;
+  }
+
+  .main-layout__page {
+    padding: 1.25rem;
+  }
+}
+
+/*
+  Responsivo para pantallas pequeñas.
+*/
+@media (max-width: 768px) {
+  .main-layout__sidenav {
+    width: 220px;
+  }
+
+  .main-layout__page {
+    padding: 1rem;
+  }
+}

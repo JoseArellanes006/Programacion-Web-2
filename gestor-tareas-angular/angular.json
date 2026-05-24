@@ -7,7 +7,7 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "gestor-tareas-angular": {
+    "Catalogo_de_Cafeterias": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -36,7 +36,9 @@
             "server": "src/main.server.ts",
             "outputMode": "server",
             "security": {
-              "allowedHosts": []
+              "allowedHosts": [
+                "*"
+              ]
             },
             "ssr": {
               "entry": "src/server.ts"
@@ -70,10 +72,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "gestor-tareas-angular:build:production"
+              "buildTarget": "Catalogo_de_Cafeterias:build:production"
             },
             "development": {
-              "buildTarget": "gestor-tareas-angular:build:development"
+              "buildTarget": "Catalogo_de_Cafeterias:build:development"
             }
           },
           "defaultConfiguration": "development"

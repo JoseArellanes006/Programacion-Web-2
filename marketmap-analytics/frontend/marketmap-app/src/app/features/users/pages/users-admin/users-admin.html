@@ -1,0 +1,148 @@
+<!--
+  Página de administración de usuarios.
+-->
+
+<section class="users-admin-page">
+  <!--
+    Encabezado principal.
+  -->
+  <header class="users-admin-page__header">
+    <div>
+      <h1>Usuarios</h1>
+      <p>
+        Administre cuentas, roles y estados de acceso dentro del sistema.
+      </p>
+    </div>
+
+    <button
+      class="btn btn-primary"
+      type="button"
+      (click)="openCreateDialog()"
+      [disabled]="loading() || processing()"
+    >
+      Nuevo usuario
+    </button>
+  </header>
+
+  <!--
+    Filtros.
+  -->
+  <section class="users-admin-page__filters">
+    <div class="form-field">
+      <label class="form-label" for="userSearch">
+        Buscar usuario
+      </label>
+
+      <input
+        id="userSearch"
+        class="form-control"
+        type="text"
+        placeholder="Nombre, correo o id"
+        [ngModel]="searchText()"
+        (ngModelChange)="updateSearchText($event)"
+      />
+    </div>
+
+    <div class="form-field">
+      <label class="form-label" for="userRole">
+        Rol
+      </label>
+
+      <select
+        id="userRole"
+        class="form-control"
+        [ngModel]="selectedRole()"
+        (ngModelChange)="updateRole($event)"
+      >
+        @for (role of roleOptions; track role.value) {
+          <option [ngValue]="role.value">
+            {{ role.label }}
+          </option>
+        }
+      </select>
+    </div>
+
+    <div class="form-field">
+      <label class="form-label" for="userStatus">
+        Estado
+      </label>
+
+      <select
+        id="userStatus"
+        class="form-control"
+        [ngModel]="selectedStatus()"
+        (ngModelChange)="updateStatus($event)"
+      >
+        @for (status of statusOptions; track status.value) {
+          <option [ngValue]="status.value">
+            {{ status.label }}
+          </option>
+        }
+      </select>
+    </div>
+
+    <div class="users-admin-page__filter-actions">
+      <button
+        class="btn btn-primary"
+        type="button"
+        (click)="searchWithBackendFilters()"
+        [disabled]="loading() || processing()"
+      >
+        Aplicar
+      </button>
+
+      <button
+        class="btn btn-outline"
+        type="button"
+        (click)="clearFilters()"
+        [disabled]="loading() || processing()"
+      >
+        Limpiar
+      </button>
+    </div>
+  </section>
+
+  <!--
+    Mensaje de error.
+  -->
+  @if (errorMessage()) {
+    <div class="users-admin-page__error">
+      {{ errorMessage() }}
+    </div>
+  }
+
+  <!--
+    Tabla de usuarios.
+  -->
+  <app-dynamic-table
+    [columns]="columns"
+    [data]="users()"
+    [loading]="loading()"
+    emptyMessage="No hay usuarios registrados."
+    (tableAction)="handleTableAction($event)"
+  />
+
+  <!--
+    Diálogo dinámico para crear o editar usuario.
+  -->
+  <app-dynamic-dialog
+    [open]="dialogOpen()"
+    [config]="dialogConfig()"
+    (confirmed)="handleDialogConfirm($event)"
+    (closed)="closeDialog()"
+  />
+
+  <!--
+    Confirmación para eliminar usuario.
+  -->
+  <app-confirm-dialog
+    [open]="deleteConfirmOpen()"
+    title="Eliminar usuario"
+    [message]="'¿Está seguro de eliminar el usuario ' + (selectedUser()?.name ?? '') + '?'"
+    confirmText="Eliminar"
+    cancelText="Cancelar"
+    [danger]="true"
+    (confirmed)="confirmDeleteUser()"
+    (cancelled)="closeDeleteConfirm()"
+  />
+</section>

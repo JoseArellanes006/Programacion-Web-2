@@ -1,0 +1,215 @@
+/*
+  Estilos del layout de autenticación.
+
+  Este layout está pensado para mostrar pantallas públicas como login,
+  registro y recuperación de contraseña.
+
+  Usa Angular Material de forma controlada:
+  - mat-card para la tarjeta del formulario.
+  - mat-icon para las características visuales del sistema.
+*/
+
+.auth-layout {
+  /*
+    Ocupa toda la pantalla.
+  */
+  min-height: 100vh;
+
+  /*
+    Divide la pantalla en dos columnas.
+  */
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+
+  /*
+    Fondo general.
+  */
+  background: var(--color-bg);
+}
+
+.auth-layout__brand {
+  /*
+    Panel izquierdo con color principal.
+  */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  background:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.24), transparent 32rem),
+    radial-gradient(circle at bottom right, rgba(96, 165, 250, 0.28), transparent 28rem),
+    linear-gradient(135deg, var(--color-primary), #0f172a);
+  color: #ffffff;
+  overflow: hidden;
+}
+
+.auth-layout__brand-card {
+  /*
+    Contenedor del texto principal del panel izquierdo.
+  */
+  max-width: 640px;
+  position: relative;
+  z-index: 1;
+
+  h1 {
+    margin: 0;
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: -0.06em;
+  }
+
+  p {
+    margin: 1.25rem 0 0;
+    max-width: 560px;
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.84);
+  }
+}
+
+.auth-layout__eyebrow {
+  /*
+    Etiqueta pequeña superior.
+  */
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding: 0.45rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.auth-layout__features {
+  /*
+    Lista visual de características del sistema.
+  */
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 2rem;
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.62rem 0.9rem;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    background: rgba(255, 255, 255, 0.14);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    backdrop-filter: blur(10px);
+  }
+
+  mat-icon {
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+    line-height: 18px;
+  }
+}
+
+.auth-layout__content {
+  /*
+    Panel derecho donde se cargan los formularios.
+  */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background:
+    radial-gradient(circle at top right, rgba(37, 99, 235, 0.08), transparent 24rem),
+    var(--color-bg);
+}
+
+.auth-layout__form-card {
+  /*
+    Tarjeta base para formularios de autenticación.
+
+    Aunque usa mat-card, se personaliza para mantener el diseño
+    del sistema y evitar el estilo Material genérico.
+  */
+  width: min(100%, 460px);
+  min-height: 420px;
+  padding: 2rem;
+  border-radius: var(--radius-xl);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-card);
+  display: block;
+}
+
+/*
+  Ajustes internos de Angular Material.
+
+  MatCard agrega estilos propios. Aquí se neutralizan los que no necesitamos.
+*/
+:host ::ng-deep .auth-layout__form-card.mat-mdc-card {
+  box-shadow: var(--shadow-card);
+}
+
+/*
+  Responsivo para pantallas medianas y pequeñas.
+*/
+@media (max-width: 900px) {
+  .auth-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-layout__brand {
+    padding: 2rem 1.25rem;
+  }
+
+  .auth-layout__brand-card {
+    h1 {
+      font-size: clamp(2.1rem, 8vw, 3.4rem);
+    }
+
+    p {
+      font-size: 1rem;
+    }
+  }
+
+  .auth-layout__content {
+    padding: 1.25rem;
+  }
+
+  .auth-layout__form-card {
+    min-height: auto;
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 560px) {
+  .auth-layout__brand {
+    align-items: flex-start;
+    padding: 1.5rem 1rem;
+  }
+
+  .auth-layout__features {
+    gap: 0.55rem;
+
+    span {
+      padding: 0.55rem 0.75rem;
+      font-size: 0.82rem;
+    }
+  }
+
+  .auth-layout__content {
+    padding: 1rem;
+  }
+
+  .auth-layout__form-card {
+    width: 100%;
+    padding: 1.25rem;
+    border-radius: var(--radius-lg);
+  }
+}

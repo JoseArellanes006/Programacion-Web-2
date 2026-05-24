@@ -1,0 +1,255 @@
+<!--
+  Diálogo dinámico reutilizable.
+
+  Renderiza campos a partir de DynamicDialogConfig.
+-->
+
+@if (open && config) {
+  <div class="dynamic-dialog">
+    <!--
+      Fondo oscuro.
+
+      Al hacer clic fuera del panel se cancela el diálogo.
+    -->
+    <div
+      class="dynamic-dialog__backdrop"
+      (click)="cancel()"
+    ></div>
+
+    <!--
+      Panel principal.
+    -->
+    <mat-card
+      class="dynamic-dialog__panel"
+      role="dialog"
+      aria-modal="true"
+      [attr.aria-label]="config.title"
+    >
+      <!--
+        Encabezado.
+      -->
+      <header class="dynamic-dialog__header">
+        <div class="dynamic-dialog__title-group">
+          <h2>{{ config.title }}</h2>
+
+          @if (config.description) {
+            <p>{{ config.description }}</p>
+          }
+        </div>
+
+        <button
+          mat-icon-button
+          type="button"
+          class="dynamic-dialog__close"
+          aria-label="Cerrar diálogo"
+          (click)="cancel()"
+        >
+          <mat-icon>close</mat-icon>
+        </button>
+      </header>
+
+      <!--
+        Formulario dinámico.
+      -->
+      <form
+        class="dynamic-dialog__form"
+        (ngSubmit)="confirm()"
+      >
+        <div class="dynamic-dialog__body">
+          @for (field of config.fields; track field.key) {
+            @if (isFieldVisible(field) && field.type !== 'hidden') {
+              <div
+                class="dynamic-dialog__field"
+                [class.dynamic-dialog__field--full]="field.fullWidth"
+              >
+                @switch (field.type) {
+                  @case ('textarea') {
+                    <mat-form-field
+                      class="dynamic-dialog__mat-field"
+                      appearance="outline"
+                    >
+                      <mat-label>{{ field.label }}</mat-label>
+
+                      <textarea
+                        matInput
+                        rows="4"
+                        [id]="field.key"
+                        [name]="field.key"
+                        [placeholder]="field.placeholder ?? ''"
+                        [disabled]="field.disabled ?? false"
+                        [ngModel]="getFieldValue(field)"
+                        (ngModelChange)="setFieldValue(field, $event)"
+                      ></textarea>
+
+                      @if (field.helperText && !hasError(field)) {
+                        <mat-hint>{{ field.helperText }}</mat-hint>
+                      }
+
+                      @if (hasError(field)) {
+                        <mat-error>{{ getError(field) }}</mat-error>
+                      }
+                    </mat-form-field>
+                  }
+
+                  @case ('select') {
+                    <mat-form-field
+                      class="dynamic-dialog__mat-field"
+                      appearance="outline"
+                    >
+                      <mat-label>{{ field.label }}</mat-label>
+
+                      <mat-select
+                        [id]="field.key"
+                        [name]="field.key"
+                        [disabled]="field.disabled ?? false"
+                        [ngModel]="getFieldValue(field)"
+                        (ngModelChange)="setFieldValue(field, $event)"
+                      >
+                        @if (field.placeholder) {
+                          <mat-option value="">
+                            {{ field.placeholder }}
+                          </mat-option>
+                        } @else {
+                          <mat-option value="">
+                            Seleccione una opción
+                          </mat-option>
+                        }
+
+                        @for (option of field.options ?? []; track option.value) {
+                          <mat-option [value]="option.value">
+                            {{ option.label }}
+                          </mat-option>
+                        }
+                      </mat-select>
+
+                      @if (field.helperText && !hasError(field)) {
+                        <mat-hint>{{ field.helperText }}</mat-hint>
+                      }
+
+                      @if (hasError(field)) {
+                        <mat-error>{{ getError(field) }}</mat-error>
+                      }
+                    </mat-form-field>
+                  }
+
+                  @case ('checkbox') {
+                    <div class="dynamic-dialog__checkbox-field">
+                      <mat-checkbox
+                        [name]="field.key"
+                        [disabled]="field.disabled ?? false"
+                        [ngModel]="getFieldValue(field)"
+                        (ngModelChange)="setFieldValue(field, $event)"
+                      >
+                        {{ field.placeholder ?? field.label }}
+                      </mat-checkbox>
+
+                      @if (field.helperText && !hasError(field)) {
+                        <small class="dynamic-dialog__helper">
+                          {{ field.helperText }}
+                        </small>
+                      }
+
+                      @if (hasError(field)) {
+                        <small class="dynamic-dialog__error">
+                          {{ getError(field) }}
+                        </small>
+                      }
+                    </div>
+                  }
+
+                  @case ('file') {
+                    <div class="dynamic-dialog__file-field">
+                      <label
+                        class="dynamic-dialog__file-label"
+                        [for]="field.key"
+                      >
+                        {{ field.label }}
+                      </label>
+
+                      <input
+                        class="dynamic-dialog__file-input"
+                        [id]="field.key"
+                        [name]="field.key"
+                        type="file"
+                        [attr.accept]="field.accept ?? null"
+                        [attr.multiple]="field.multiple ? '' : null"
+                        [disabled]="field.disabled ?? false"
+                        (change)="handleFileChange($event, field)"
+                      />
+
+                      <small
+                        class="dynamic-dialog__helper"
+                        [class.dynamic-dialog__error]="hasError(field)"
+                      >
+                        {{ hasError(field) ? getError(field) : getFileHelperText(field) }}
+                      </small>
+                    </div>
+                  }
+
+                  @default {
+                    <mat-form-field
+                      class="dynamic-dialog__mat-field"
+                      appearance="outline"
+                    >
+                      <mat-label>{{ field.label }}</mat-label>
+
+                      <input
+                        matInput
+                        [id]="field.key"
+                        [name]="field.key"
+                        [type]="field.type"
+                        [placeholder]="field.placeholder ?? ''"
+                        [disabled]="field.disabled ?? false"
+                        [ngModel]="getFieldValue(field)"
+                        (ngModelChange)="setFieldValue(field, $event)"
+                      />
+
+                      @if (field.helperText && !hasError(field)) {
+                        <mat-hint>{{ field.helperText }}</mat-hint>
+                      }
+
+                      @if (hasError(field)) {
+                        <mat-error>{{ getError(field) }}</mat-error>
+                      }
+                    </mat-form-field>
+                  }
+                }
+              </div>
+            }
+
+            @if (field.type === 'hidden') {
+              <input
+                [id]="field.key"
+                [name]="field.key"
+                type="hidden"
+                [ngModel]="getFieldValue(field)"
+                (ngModelChange)="setFieldValue(field, $event)"
+              />
+            }
+          }
+        </div>
+
+        <!--
+          Acciones.
+        -->
+        <footer class="dynamic-dialog__footer">
+          <button
+            mat-stroked-button
+            type="button"
+            (click)="cancel()"
+          >
+            {{ config.cancelText ?? 'Cancelar' }}
+          </button>
+
+          <button
+            mat-flat-button
+            type="submit"
+            [color]="config.danger ? 'warn' : 'primary'"
+          >
+            {{ config.confirmText }}
+          </button>
+        </footer>
+      </form>
+    </mat-card>
+  </div>
+}

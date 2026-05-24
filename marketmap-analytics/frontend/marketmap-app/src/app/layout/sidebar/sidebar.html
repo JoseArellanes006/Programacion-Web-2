@@ -1,0 +1,57 @@
+<!--
+  Sidebar principal de navegación.
+
+  Muestra el nombre del sistema y las rutas principales.
+-->
+
+<aside class="sidebar">
+  <!--
+    Encabezado del sidebar.
+  -->
+  <header class="sidebar__header">
+    <div class="sidebar__logo">
+      <mat-icon>analytics</mat-icon>
+    </div>
+
+    <div class="sidebar__brand">
+      <strong>{{ appName }}</strong>
+      <span>Analytics</span>
+    </div>
+  </header>
+
+  <!--
+    Navegación principal.
+  -->
+  <nav class="sidebar__nav" aria-label="Navegación principal">
+    <!--
+      @for es la sintaxis moderna de Angular para iterar listas.
+
+      visibleNavItems() regresa solamente las opciones permitidas
+      para el rol actual.
+    -->
+    @for (item of visibleNavItems(); track item.route) {
+      <a
+        class="sidebar__link"
+        [routerLink]="item.route"
+        routerLinkActive="sidebar__link--active"
+        [routerLinkActiveOptions]="{ exact: item.route === '/dashboard' }"
+      >
+        <span class="sidebar__icon">
+          <mat-icon>{{ item.icon }}</mat-icon>
+        </span>
+
+        <span class="sidebar__label">
+          {{ item.label }}
+        </span>
+      </a>
+    }
+  </nav>
+
+  <!--
+    Pie del sidebar.
+  -->
+  <footer class="sidebar__footer">
+    <span>MarketMap</span>
+    <small>Angular + FastAPI</small>
+  </footer>
+</aside>

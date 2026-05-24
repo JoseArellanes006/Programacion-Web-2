@@ -1,0 +1,50 @@
+<!--
+  Tarjeta KPI reutilizable.
+
+  Muestra:
+  - título
+  - valor principal
+  - subtítulo
+  - ícono de Angular Material
+  - tendencia opcional
+-->
+
+@if (kpi) {
+  <mat-card class="kpi-card" [class]="toneClass">
+    <div class="kpi-card__top">
+      <div class="kpi-card__info">
+        <p class="kpi-card__title">
+          {{ title }}
+        </p>
+
+        <strong class="kpi-card__value">
+          {{ value }}
+        </strong>
+
+        <p class="kpi-card__description">
+          {{ subtitle }}
+        </p>
+      </div>
+
+      <div class="kpi-card__icon" aria-hidden="true">
+        <mat-icon>
+          {{ icon }}
+        </mat-icon>
+      </div>
+    </div>
+
+    @if (showFooter) {
+      <div class="kpi-card__footer">
+        <span class="kpi-card__trend" [class]="trendClass">
+          {{ trendText }}
+        </span>
+
+        @if (changePercentage !== null) {
+          <span class="kpi-card__change">
+            {{ changeText }}
+          </span>
+        }
+      </div>
+    }
+  </mat-card>
+}

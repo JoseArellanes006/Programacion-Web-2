@@ -1,0 +1,226 @@
+/*
+  Estilos del diálogo dinámico.
+
+  Usa Angular Material de forma controlada:
+  - mat-card para el panel
+  - mat-form-field para campos
+  - mat-select para selects
+  - mat-checkbox para booleanos
+  - mat-button para acciones
+
+  El componente conserva el diseño general del sistema.
+*/
+
+.dynamic-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+
+.dynamic-dialog__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.58);
+  backdrop-filter: blur(4px);
+}
+
+.dynamic-dialog__panel {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 760px);
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-card);
+  color: var(--color-text);
+  overflow: hidden;
+}
+
+/*
+  Limpieza visual de mat-card.
+*/
+:host ::ng-deep .dynamic-dialog__panel.mat-mdc-card {
+  box-shadow: var(--shadow-card);
+}
+
+.dynamic-dialog__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--color-border);
+  flex: 0 0 auto;
+}
+
+.dynamic-dialog__title-group {
+  min-width: 0;
+
+  h2 {
+    margin: 0;
+    font-size: 1.35rem;
+    font-weight: 900;
+    color: var(--color-text);
+    line-height: 1.25;
+  }
+
+  p {
+    margin: 0.4rem 0 0;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+  }
+}
+
+.dynamic-dialog__close {
+  flex: 0 0 auto;
+  color: var(--color-text-muted);
+}
+
+.dynamic-dialog__form {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.dynamic-dialog__body {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  padding: 1.5rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
+}
+
+.dynamic-dialog__field {
+  min-width: 0;
+}
+
+.dynamic-dialog__field--full {
+  grid-column: 1 / -1;
+}
+
+.dynamic-dialog__mat-field {
+  width: 100%;
+}
+
+/*
+  Checkbox.
+*/
+.dynamic-dialog__checkbox-field {
+  min-height: 56px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0;
+}
+
+/*
+  Campo de archivo.
+*/
+.dynamic-dialog__file-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 0.85rem;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-alt);
+}
+
+.dynamic-dialog__file-label {
+  color: var(--color-text);
+  font-size: 0.88rem;
+  font-weight: 900;
+}
+
+.dynamic-dialog__file-input {
+  width: 100%;
+  color: var(--color-text-muted);
+  font-size: 0.88rem;
+}
+
+.dynamic-dialog__file-input::file-selector-button {
+  margin-right: 0.75rem;
+  padding: 0.55rem 0.8rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-primary);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.dynamic-dialog__helper {
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
+.dynamic-dialog__error {
+  color: var(--color-danger);
+  font-size: 0.78rem;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.dynamic-dialog__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-surface-alt);
+  flex: 0 0 auto;
+
+  button {
+    font-weight: 800;
+  }
+}
+
+/*
+  Ajustes visuales de Angular Material dentro del diálogo.
+*/
+:host ::ng-deep .mat-mdc-form-field {
+  font-family: inherit;
+}
+
+:host ::ng-deep .mat-mdc-text-field-wrapper {
+  background: var(--color-surface);
+}
+
+/*
+  Responsivo.
+*/
+@media (max-width: 700px) {
+  .dynamic-dialog__panel {
+    width: min(100%, 520px);
+    max-height: 92vh;
+  }
+
+  .dynamic-dialog__body {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+  }
+
+  .dynamic-dialog__header {
+    padding: 1.15rem;
+  }
+
+  .dynamic-dialog__footer {
+    flex-direction: column-reverse;
+    padding: 1rem;
+
+    button {
+      width: 100%;
+    }
+  }
+}

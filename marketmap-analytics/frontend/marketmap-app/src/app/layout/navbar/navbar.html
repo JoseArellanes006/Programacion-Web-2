@@ -1,0 +1,114 @@
+<!--
+  Barra superior del sistema.
+-->
+
+<header class="navbar">
+  <!--
+    Título contextual del panel.
+  -->
+  <div class="navbar__title">
+    <span>Panel de control</span>
+    <small>Gestión comercial y análisis operativo</small>
+  </div>
+
+  <!--
+    Acciones del lado derecho.
+  -->
+  <div class="navbar__actions">
+    <!--
+      Notificaciones.
+    -->
+    <button
+      type="button"
+      class="navbar__icon-button"
+      aria-label="Ver notificaciones"
+      (click)="showNotifications()"
+    >
+      <mat-icon>notifications</mat-icon>
+    </button>
+
+    <!--
+      Acceso rápido al carrito.
+
+      Muestra el número de productos considerando cantidades.
+    -->
+    <button
+      type="button"
+      class="navbar__icon-button navbar__cart-button"
+      aria-label="Ir al carrito"
+      (click)="goToCart()"
+    >
+      <mat-icon>shopping_cart</mat-icon>
+
+      @if (hasCartItems()) {
+        <span class="navbar__cart-badge">
+          {{ cartTotalItems() }}
+        </span>
+      }
+    </button>
+
+    <!--
+      Menú de usuario.
+    -->
+    <div class="navbar__user-menu">
+      <button
+        type="button"
+        class="navbar__user"
+        aria-label="Abrir menú de usuario"
+        (click)="toggleUserMenu()"
+      >
+        <div class="navbar__avatar">
+          @if (avatarUrl()) {
+            <img
+              [src]="avatarUrl()"
+              [alt]="displayName()"
+            />
+          } @else {
+            <span>{{ userInitials() }}</span>
+          }
+        </div>
+
+        <div class="navbar__user-info">
+          <strong>{{ displayName() }}</strong>
+          <span>{{ displayRole() }} · {{ displayEmail() }}</span>
+        </div>
+
+        <mat-icon class="navbar__user-arrow">
+          expand_more
+        </mat-icon>
+      </button>
+
+      @if (userMenuOpen()) {
+        <div class="navbar__dropdown">
+          <div class="navbar__dropdown-user">
+            <div class="navbar__dropdown-avatar">
+              @if (avatarUrl()) {
+                <img
+                  [src]="avatarUrl()"
+                  [alt]="displayName()"
+                />
+              } @else {
+                <span>{{ userInitials() }}</span>
+              }
+            </div>
+
+            <div class="navbar__dropdown-info">
+              <strong>{{ displayName() }}</strong>
+              <span>{{ displayEmail() }}</span>
+              <small>{{ displayRole() }}</small>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            class="navbar__dropdown-action"
+            (click)="logout()"
+          >
+            <mat-icon>logout</mat-icon>
+            Cerrar sesión
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+</header>

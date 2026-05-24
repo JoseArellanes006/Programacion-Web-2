@@ -1,0 +1,472 @@
+<!--
+  Página de mapa interactivo.
+-->
+
+<section class="interactive-map-page">
+  <!--
+    Encabezado principal.
+  -->
+  <header class="interactive-map-page__header">
+    <div>
+      <h1>Mapa interactivo</h1>
+      <p>
+        Visualice zonas, disponibilidad, ocupación y pedidos asociados.
+      </p>
+    </div>
+
+    <div class="interactive-map-page__header-actions">
+      <input
+        #backgroundInput
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        hidden
+        (change)="uploadBackgroundImage($event)"
+      />
+
+      <button
+        mat-stroked-button
+        type="button"
+        (click)="backgroundInput.click()"
+        [disabled]="loading() || processing() || uploadingBackground() || !layout()"
+      >
+        <mat-icon>
+          {{ uploadingBackground() ? 'hourglass_empty' : 'upload' }}
+        </mat-icon>
+
+        {{ uploadingBackground() ? 'Cargando...' : 'Cargar imagen del mapa' }}
+      </button>
+
+      <button
+        mat-stroked-button
+        type="button"
+        (click)="loadMap()"
+        [disabled]="loading() || processing() || uploadingBackground()"
+      >
+        <mat-icon>refresh</mat-icon>
+        Actualizar mapa
+      </button>
+    </div>
+  </header>
+
+  <!--
+    Mensaje de error.
+  -->
+  @if (errorMessage()) {
+    <div class="interactive-map-page__error">
+      {{ errorMessage() }}
+    </div>
+  }
+
+  <!--
+    Estado de carga.
+  -->
+  @if (loading()) {
+    <mat-card class="interactive-map-page__loading">
+      <mat-progress-spinner
+        mode="indeterminate"
+        diameter="42"
+      />
+
+      <p>Cargando mapa interactivo...</p>
+    </mat-card>
+  }
+
+  <!--
+    Contenido cuando existe layout.
+  -->
+  @if (!loading() && layout()) {
+    <!--
+      Resumen de ocupación.
+    -->
+    <section class="interactive-map-page__summary">
+      <mat-card>
+        <mat-icon>dashboard</mat-icon>
+        <span>Total</span>
+        <strong>{{ summary()?.totalZones ?? 0 }}</strong>
+      </mat-card>
+
+      <mat-card>
+        <mat-icon>event_available</mat-icon>
+        <span>Disponibles</span>
+        <strong>{{ summary()?.availableZones ?? 0 }}</strong>
+      </mat-card>
+
+      <mat-card>
+        <mat-icon>event_busy</mat-icon>
+        <span>Ocupadas</span>
+        <strong>{{ summary()?.occupiedZones ?? 0 }}</strong>
+      </mat-card>
+
+      <mat-card>
+        <mat-icon>bookmark</mat-icon>
+        <span>Reservadas</span>
+        <strong>{{ summary()?.reservedZones ?? 0 }}</strong>
+      </mat-card>
+
+      <mat-card>
+        <mat-icon>block</mat-icon>
+        <span>Inactivas</span>
+        <strong>{{ summary()?.inactiveZones ?? 0 }}</strong>
+      </mat-card>
+    </section>
+
+    <section class="interactive-map-page__content">
+      <!--
+        Área visual del mapa.
+      -->
+      <mat-card class="interactive-map">
+        <header class="interactive-map__header">
+          <div>
+            <h2>{{ layout()?.name }}</h2>
+
+            @if (layout()?.description) {
+              <p>{{ layout()?.description }}</p>
+            }
+          </div>
+
+          <div class="interactive-map__helper">
+            <mat-icon>draw</mat-icon>
+            <span>Arrastre sobre el plano para dibujar una zona.</span>
+          </div>
+        </header>
+
+        <mat-divider />
+
+        <div
+          #mapCanvas
+          class="interactive-map__canvas"
+          (mousedown)="startDrawing($event)"
+          (mousemove)="continueDrawing($event)"
+          (mouseup)="finishDrawing()"
+          (mouseleave)="cancelDrawingIfNeeded()"
+        >
+          @if (getBackgroundImageUrl()) {
+            <img
+              #mapImage
+              class="interactive-map__background"
+              [src]="getBackgroundImageUrl()"
+              [alt]="layout()?.name"
+              (load)="onMapImageLoad()"
+              draggable="false"
+            />
+          } @else {
+            <div class="interactive-map__empty-background">
+              <mat-icon>map</mat-icon>
+              <span>Layout sin imagen base</span>
+              <small>
+                Use el botón “Cargar imagen del mapa” para agregar un plano.
+              </small>
+            </div>
+          }
+
+          @for (zone of zones(); track zone.id) {
+            <button
+              type="button"
+              class="interactive-map__zone"
+              [class]="getZoneStatusClass(zone)"
+              [class.interactive-map__zone--selected]="selectedZone()?.id === zone.id"
+              [style.left]="getZoneStyle(zone)['left']"
+              [style.top]="getZoneStyle(zone)['top']"
+              [style.width]="getZoneStyle(zone)['width']"
+              [style.height]="getZoneStyle(zone)['height']"
+              (mousedown)="$event.stopPropagation()"
+              (click)="selectZone(zone); $event.stopPropagation()"
+            >
+              <mat-icon>{{ getStatusIcon(zone.status) }}</mat-icon>
+              <strong>{{ zone.name }}</strong>
+              <span>{{ getStatusLabel(zone.status) }}</span>
+            </button>
+          }
+
+          @if (drawingPreview()) {
+            <div
+              class="interactive-map__draft-selection"
+              [style.left]="getDrawingPreviewStyle()['left']"
+              [style.top]="getDrawingPreviewStyle()['top']"
+              [style.width]="getDrawingPreviewStyle()['width']"
+              [style.height]="getDrawingPreviewStyle()['height']"
+            ></div>
+          }
+
+          @if (hasDraftZone()) {
+            <div
+              class="interactive-map__zone interactive-map__zone--pending"
+              [style.left]="getDraftZoneStyle()['left']"
+              [style.top]="getDraftZoneStyle()['top']"
+              [style.width]="getDraftZoneStyle()['width']"
+              [style.height]="getDraftZoneStyle()['height']"
+            >
+              <mat-icon>add_location_alt</mat-icon>
+              <strong>Nueva zona</strong>
+              <span>Pendiente</span>
+            </div>
+          }
+        </div>
+
+        <mat-divider />
+
+        <footer class="interactive-map__legend">
+          <span class="legend legend--available">Disponible</span>
+          <span class="legend legend--occupied">Ocupada</span>
+          <span class="legend legend--reserved">Reservada</span>
+          <span class="legend legend--inactive">Inactiva</span>
+
+          @if (hasDraftZone()) {
+            <span class="legend legend--pending">Nueva zona</span>
+          }
+        </footer>
+      </mat-card>
+
+      <!--
+        Panel lateral.
+      -->
+      <mat-card class="zone-panel">
+        @if (!hasSelectedZone() && !hasDraftZone()) {
+          <div class="zone-panel__compact-empty">
+            <mat-icon>touch_app</mat-icon>
+
+            <div>
+              <strong>Seleccione o dibuje una zona</strong>
+              <p>
+                Haga clic en una zona existente o arrastre sobre el mapa para crear una nueva.
+              </p>
+            </div>
+          </div>
+        }
+
+        @if (hasDraftZone()) {
+          <section class="zone-panel__section">
+            <header class="zone-panel__header">
+              <div>
+                <span>Nueva zona</span>
+                <h2>Guardar área dibujada</h2>
+
+                <mat-chip>
+                  <mat-icon>add_location_alt</mat-icon>
+                  Pendiente
+                </mat-chip>
+              </div>
+
+              <button
+                mat-icon-button
+                type="button"
+                aria-label="Cancelar zona"
+                (click)="cancelDraftZone()"
+                [disabled]="processing()"
+              >
+                <mat-icon>close</mat-icon>
+              </button>
+            </header>
+
+            <mat-divider />
+
+            <section class="zone-panel__form">
+              <mat-form-field appearance="outline">
+                <mat-label>Nombre de la zona</mat-label>
+
+                <input
+                  matInput
+                  type="text"
+                  placeholder="Ej. Mesa 1"
+                  [ngModel]="draftZoneName()"
+                  (ngModelChange)="draftZoneName.set($event)"
+                  name="zoneName"
+                  [disabled]="processing()"
+                />
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Tipo de zona</mat-label>
+
+                <mat-select
+                  [ngModel]="draftZoneType()"
+                  (ngModelChange)="draftZoneType.set($event)"
+                  name="zoneType"
+                  [disabled]="processing()"
+                >
+                  @for (type of zoneTypeOptions; track type.value) {
+                    <mat-option [value]="type.value">
+                      {{ type.label }}
+                    </mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Estado inicial</mat-label>
+
+                <mat-select
+                  [ngModel]="draftZoneStatus()"
+                  (ngModelChange)="draftZoneStatus.set($event)"
+                  name="zoneStatus"
+                  [disabled]="processing()"
+                >
+                  @for (option of statusOptions; track option.value) {
+                    <mat-option [value]="option.value">
+                      {{ option.label }}
+                    </mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Capacidad</mat-label>
+
+                <input
+                  matInput
+                  type="number"
+                  min="1"
+                  placeholder="Ej. 4"
+                  [ngModel]="draftZoneCapacity()"
+                  (ngModelChange)="draftZoneCapacity.set($event)"
+                  name="zoneCapacity"
+                  [disabled]="processing()"
+                />
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Descripción</mat-label>
+
+                <textarea
+                  matInput
+                  rows="3"
+                  placeholder="Descripción opcional"
+                  [ngModel]="draftZoneDescription()"
+                  (ngModelChange)="draftZoneDescription.set($event)"
+                  name="zoneDescription"
+                  [disabled]="processing()"
+                ></textarea>
+              </mat-form-field>
+            </section>
+
+            <mat-divider />
+
+            <section class="zone-panel__actions">
+              <button
+                mat-flat-button
+                color="primary"
+                type="button"
+                (click)="saveDraftZone()"
+                [disabled]="processing()"
+              >
+                <mat-icon>
+                  {{ processing() ? 'hourglass_empty' : 'save' }}
+                </mat-icon>
+
+                {{ processing() ? 'Guardando...' : 'Guardar zona' }}
+              </button>
+
+              <button
+                mat-stroked-button
+                type="button"
+                (click)="cancelDraftZone()"
+                [disabled]="processing()"
+              >
+                <mat-icon>close</mat-icon>
+                Cancelar
+              </button>
+            </section>
+          </section>
+        }
+
+        @if (!hasDraftZone() && selectedZone()) {
+          <section class="zone-panel__section">
+            <header class="zone-panel__header">
+              <div>
+                <span>{{ selectedZone()?.type }}</span>
+                <h2>{{ selectedZone()?.name }}</h2>
+
+                <mat-chip>
+                  <mat-icon>{{ getStatusIcon(selectedZone()!.status) }}</mat-icon>
+                  {{ getStatusLabel(selectedZone()!.status) }}
+                </mat-chip>
+              </div>
+
+              <button
+                mat-icon-button
+                type="button"
+                aria-label="Cerrar zona seleccionada"
+                (click)="clearSelectedZone()"
+              >
+                <mat-icon>close</mat-icon>
+              </button>
+            </header>
+
+            <mat-divider />
+
+            <section class="zone-panel__info">
+              <div>
+                <span>Capacidad</span>
+                <strong>{{ selectedZone()?.capacity ?? 'No definida' }}</strong>
+              </div>
+
+              <div>
+                <span>Pedido asociado</span>
+                <strong>{{ selectedZone()?.currentOrderFolio ?? 'Sin pedido' }}</strong>
+              </div>
+
+              <div>
+                <span>Total actual</span>
+
+                <strong>
+                  @if (hasCurrentOrderTotal(selectedZone()!)) {
+                    {{ selectedZone()?.currentOrderTotal | currencyFormat }}
+                  } @else {
+                    -
+                  }
+                </strong>
+              </div>
+            </section>
+
+            <mat-divider />
+
+            <section class="zone-panel__actions">
+              <h3>Cambiar estado</h3>
+
+              <div class="zone-panel__status-grid">
+                @for (option of statusOptions; track option.value) {
+                  <button
+                    mat-stroked-button
+                    type="button"
+                    [disabled]="processing() || selectedZone()?.status === option.value"
+                    (click)="updateSelectedZoneStatus(option.value)"
+                  >
+                    <mat-icon>{{ option.icon }}</mat-icon>
+                    {{ option.label }}
+                  </button>
+                }
+              </div>
+
+              @if (canReleaseZone(selectedZone()!)) {
+                <button
+                  mat-flat-button
+                  color="primary"
+                  type="button"
+                  [disabled]="processing()"
+                  (click)="releaseSelectedZone()"
+                >
+                  <mat-icon>logout</mat-icon>
+                  Liberar zona
+                </button>
+              }
+            </section>
+          </section>
+        }
+      </mat-card>
+    </section>
+  }
+
+  <!--
+    Estado sin layout.
+  -->
+  @if (!loading() && !layout() && !errorMessage()) {
+    <mat-card class="interactive-map-page__empty">
+      <mat-icon>map</mat-icon>
+
+      <strong>No hay mapa configurado</strong>
+      <p>
+        El backend no devolvió un layout activo para mostrar.
+      </p>
+    </mat-card>
+  }
+</section>

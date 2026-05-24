@@ -1,0 +1,442 @@
+[
+    {
+        "id": 1,
+        "unidad": "ESP32-IR-01",
+        "sensor": "E18-D80NK",
+        "estado": 0,
+        "detectado": true,
+        "fecha": "2026-05-24",
+        "hora": "14:39:40",
+        "fecha_hora": "2026-05-24 14:39:40"
+    },
+    {
+        "id": 2,
+        "unidad": "ESP32-PRUEBA",
+        "sensor": "PRUEBA-SIN-SENSOR",
+        "estado": 0,
+        "detectado": true,
+        "fecha": "2026-05-24",
+        "hora": "15:59:58",
+        "fecha_hora": "2026-05-24 15:59:58"
+    },
+    {
+        "id": 3,
+        "unidad": "ESP32-PRUEBA",
+        "sensor": "PRUEBA-SIN-SENSOR",
+        "estado": 1,
+        "detectado": false,
+        "fecha": "2026-05-24",
+        "hora": "15:59:58",
+        "fecha_hora": "2026-05-24 15:59:58"
+    },
+    {
+        "id": 4,
+        "unidad": "ESP32-PRUEBA",
+        "sensor": "PRUEBA-SIN-SENSOR",
+        "estado": 0,
+        "detectado": true,
+        "fecha": "2026-05-24",
+        "hora": "16:00:03",
+        "fecha_hora": "2026-05-24 16:00:03"
+    },
+    {
+        "id": 5,
+        "unidad": "ESP32-PRUEBA",
+        "sensor": "PRUEBA-SIN-SENSOR",
+        "estado": 1,
+        "detectado": false,
+        "fecha": "2026-05-24",
+        "hora": "16:00:08",
+        "fecha_hora": "2026-05-24 16:00:08"
+    },
+    {
+        "id": 6,
+        "unidad": "ESP32-PRUEBA",
+        "sensor": "PRUEBA-SIN-SENSOR",
+        "estado": 0,
+        "detectado": true,
+        "fecha": "2026-05-24",
+        "hora": "16:00:13",
+        "fecha_hora": "2026-05-24 16:00:13"
+    },
+    {
+        "id": 7,
+        "unidad": "ESP32-PRUEBA",
+        "sensor": "PRUEBA-SIN-SENSOR",
+        "estado": 1,
+        "detectado": false,
+        "fecha": "2026-05-24",
+        "hora": "16:00:18",
+        "fecha_hora": "2026-05-24 16:00:18"
+    },
+    {
+        "id": 8,
+        "unidad": "ESP32-PRUEBA",
+        "sensor": "PRUEBA-SIN-SENSOR",
+        "estado": 0,
+        "detectado": true,
+        "fecha": "2026-05-24",
+        "hora": "16:00:23",
+        "fecha_hora": "2026-05-24 16:00:23"
+    },
+    {
+        "id": 9,
+        "unidad": "ESP32-PRUEBA",
+        "sensor": "PRUEBA-SIN-SENSOR",
+        "estado": 1,
+        "detectado": false,
+        "fecha": "2026-05-24",
+        "hora": "16:00:28",
+        "fecha_hora": "2026-05-24 16:00:28"
+    },
+    {
+        "id": 10,
+        "unidad": "ESP32-PRUEBA",
+        "sensor": "PRUEBA-SIN-SENSOR",
+        "estado": 0,
+        "detectado": true,
+        "fecha": "2026-05-24",
+        "hora": "16:00:33",
+        "fecha_hora": "2026-05-24 16:00:33"
+    },
+    {
+        "id": 11,
+        "unidad": "ESP32-PRUEBA",
+        "sensor": "PRUEBA-SIN-SENSOR",
+        "estado": 1,
+        "detectado": false,
+        "fecha": "2026-05-24",
+        "hora": "16:00:38",
+        "fecha_hora": "2026-05-24 16:00:38"
+    },
+    {
+        "id": 12,
+        "unidad": "ESP32-PRUEBA",
+        "sensor": "PRUEBA-SIN-SENSOR",
+        "estado": 0,
+        "detectado": true,
+        "fecha": "2026-05-24",
+        "hora": "16:00:44",
+        "fecha_hora": "2026-05-24 16:00:44"
+    },
+    {
+        "id": 13,
+        "unidad": "ESP32-PRUEBA",
+        "sensor": "PRUEBA-SIN-SENSOR",
+        "estado": 1,
+        "detectado": false,
+        "fecha": "2026-05-24",
+        "hora": "16:00:48",
+        "fecha_hora": "2026-05-24 16:00:48"
+    },
+    {
+        "id": 14,
+        "unidad": "ESP32-PRUEBA",
+        "sensor": "PRUEBA-SIN-SENSOR",
+        "estado": 0,
+        "detectado": true,
+        "fecha": "2026-05-24",
+        "hora": "16:00:53",
+        "fecha_hora": "2026-05-24 16:00:53"
+    },
+    {
+        "id": 15,
+        "unidad": "ESP32-PRUEBA",
+        "sensor": "PRUEBA-SIN-SENSOR",
+        "estado": 1,
+        "detectado": false,
+        "fecha": "2026-05-24",
+        "hora": "16:00:58",
+        "fecha_hora": "2026-05-24 16:00:58"
+    },
+    {
+        "id": 16,
+        "unidad": "ESP32-PRUEBA",
+        "sensor": "PRUEBA-SIN-SENSOR",
+        "estado": 0,
+        "detectado": true,
+        "fecha": "2026-05-24",
+        "hora": "16:01:03",
+        "fecha_hora": "2026-05-24 16:01:03"
+    },
+    {
+        "id": 17,
+        "unidad": "ESP32-PRUEBA",
+        "sensor": "PRUEBA-SIN-SENSOR",
+        "estado": 1,
+        "detectado": false,
+        "fecha": "2026-05-24",
+        "hora": "16:01:08",
+        "fecha_hora": "2026-05-24 16:01:08"
+    },
+    {
+        "id": 18,
+        "unidad": "ESP32-PRUEBA",
+        "sensor": "PRUEBA-SIN-SENSOR",
+        "estado": 0,
+        "detectado": true,
+        "fecha": "2026-05-24",
+        "hora": "16:01:13",
+        "fecha_hora": "2026-05-24 16:01:13"
+    },
+    {
+        "id": 19,
+        "unidad": "ESP32-PRUEBA",
+        "sensor": "PRUEBA-SIN-SENSOR",
+        "estado": 1,
+        "detectado": false,
+        "fecha": "2026-05-24",
+        "hora": "16:01:18",
+        "fecha_hora": "2026-05-24 16:01:18"
+    },
+    {
+        "id": 20,
+        "unidad": "ESP32-PRUEBA",
+        "sensor": "PRUEBA-SIN-SENSOR",
+        "estado": 0,
+        "detectado": true,
+        "fecha": "2026-05-24",
+        "hora": "16:01:23",
+        "fecha_hora": "2026-05-24 16:01:23"
+    },
+    {
+        "id": 21,
+        "unidad": "ESP32-PRUEBA",
+        "sensor": "PRUEBA-SIN-SENSOR",
+        "estado": 1,
+        "detectado": false,
+        "fecha": "2026-05-24",
+        "hora": "16:01:28",
+        "fecha_hora": "2026-05-24 16:01:28"
+    },
+    {
+        "id": 22,
+        "unidad": "ESP32-PRUEBA",
+        "sensor": "PRUEBA-SIN-SENSOR",
+        "estado": 0,
+        "detectado": true,
+        "fecha": "2026-05-24",
+        "hora": "16:01:34",
+        "fecha_hora": "2026-05-24 16:01:34"
+    },
+    {
+        "id": 23,
+        "unidad": "ESP32-PRUEBA",
+        "sensor": "PRUEBA-SIN-SENSOR",
+        "estado": 1,
+        "detectado": false,
+        "fecha": "2026-05-24",
+        "hora": "16:01:38",
+        "fecha_hora": "2026-05-24 16:01:38"
+    },
+    {
+        "id": 24,
+        "unidad": "ESP32-PRUEBA",
+        "sensor": "PRUEBA-SIN-SENSOR",
+        "estado": 0,
+        "detectado": true,
+        "fecha": "2026-05-24",
+        "hora": "16:01:43",
+        "fecha_hora": "2026-05-24 16:01:43"
+    },
+    {
+        "id": 25,
+        "unidad": "ESP32-PRUEBA",
+        "sensor": "PRUEBA-SIN-SENSOR",
+        "estado": 1,
+        "detectado": false,
+        "fecha": "2026-05-24",
+        "hora": "16:01:48",
+        "fecha_hora": "2026-05-24 16:01:48"
+    },
+    {
+        "id": 26,
+        "unidad": "ESP32-PRUEBA",
+        "sensor": "PRUEBA-SIN-SENSOR",
+        "estado": 0,
+        "detectado": true,
+        "fecha": "2026-05-24",
+        "hora": "16:01:53",
+        "fecha_hora": "2026-05-24 16:01:53"
+    },
+    {
+        "id": 27,
+        "unidad": "ESP32-PRUEBA",
+        "sensor": "PRUEBA-SIN-SENSOR",
+        "estado": 1,
+        "detectado": false,
+        "fecha": "2026-05-24",
+        "hora": "16:01:58",
+        "fecha_hora": "2026-05-24 16:01:58"
+    },
+    {
+        "id": 28,
+        "unidad": "ESP32-PRUEBA",
+        "sensor": "PRUEBA-SIN-SENSOR",
+        "estado": 0,
+        "detectado": true,
+        "fecha": "2026-05-24",
+        "hora": "16:02:05",
+        "fecha_hora": "2026-05-24 16:02:05"
+    },
+    {
+        "id": 29,
+        "unidad": "ESP32-PRUEBA",
+        "sensor": "PRUEBA-SIN-SENSOR",
+        "estado": 1,
+        "detectado": false,
+        "fecha": "2026-05-24",
+        "hora": "16:02:08",
+        "fecha_hora": "2026-05-24 16:02:08"
+    },
+    {
+        "id": 30,
+        "unidad": "ESP32-PRUEBA",
+        "sensor": "PRUEBA-SIN-SENSOR",
+        "estado": 0,
+        "detectado": true,
+        "fecha": "2026-05-24",
+        "hora": "16:02:13",
+        "fecha_hora": "2026-05-24 16:02:13"
+    },
+    {
+        "id": 31,
+        "unidad": "ESP32-PRUEBA",
+        "sensor": "PRUEBA-SIN-SENSOR",
+        "estado": 1,
+        "detectado": false,
+        "fecha": "2026-05-24",
+        "hora": "16:02:18",
+        "fecha_hora": "2026-05-24 16:02:18"
+    },
+    {
+        "id": 32,
+        "unidad": "ESP32-PRUEBA",
+        "sensor": "PRUEBA-SIN-SENSOR",
+        "estado": 0,
+        "detectado": true,
+        "fecha": "2026-05-24",
+        "hora": "16:02:23",
+        "fecha_hora": "2026-05-24 16:02:23"
+    },
+    {
+        "id": 33,
+        "unidad": "ESP32-PRUEBA",
+        "sensor": "PRUEBA-SIN-SENSOR",
+        "estado": 1,
+        "detectado": false,
+        "fecha": "2026-05-24",
+        "hora": "16:02:28",
+        "fecha_hora": "2026-05-24 16:02:28"
+    },
+    {
+        "id": 34,
+        "unidad": "ESP32-PRUEBA",
+        "sensor": "PRUEBA-SIN-SENSOR",
+        "estado": 0,
+        "detectado": true,
+        "fecha": "2026-05-24",
+        "hora": "16:02:33",
+        "fecha_hora": "2026-05-24 16:02:33"
+    },
+    {
+        "id": 35,
+        "unidad": "ESP32-PRUEBA",
+        "sensor": "PRUEBA-SIN-SENSOR",
+        "estado": 1,
+        "detectado": false,
+        "fecha": "2026-05-24",
+        "hora": "16:02:38",
+        "fecha_hora": "2026-05-24 16:02:38"
+    },
+    {
+        "id": 36,
+        "unidad": "ESP32-PRUEBA",
+        "sensor": "PRUEBA-SIN-SENSOR",
+        "estado": 0,
+        "detectado": true,
+        "fecha": "2026-05-24",
+        "hora": "16:02:43",
+        "fecha_hora": "2026-05-24 16:02:43"
+    },
+    {
+        "id": 37,
+        "unidad": "ESP32-PRUEBA",
+        "sensor": "PRUEBA-SIN-SENSOR",
+        "estado": 1,
+        "detectado": false,
+        "fecha": "2026-05-24",
+        "hora": "16:02:48",
+        "fecha_hora": "2026-05-24 16:02:48"
+    },
+    {
+        "id": 38,
+        "unidad": "ESP32-PRUEBA",
+        "sensor": "PRUEBA-SIN-SENSOR",
+        "estado": 0,
+        "detectado": true,
+        "fecha": "2026-05-24",
+        "hora": "16:02:53",
+        "fecha_hora": "2026-05-24 16:02:53"
+    },
+    {
+        "id": 39,
+        "unidad": "ESP32-PRUEBA",
+        "sensor": "PRUEBA-SIN-SENSOR",
+        "estado": 1,
+        "detectado": false,
+        "fecha": "2026-05-24",
+        "hora": "16:02:58",
+        "fecha_hora": "2026-05-24 16:02:58"
+    },
+    {
+        "id": 40,
+        "unidad": "ESP32-PRUEBA",
+        "sensor": "PRUEBA-SIN-SENSOR",
+        "estado": 0,
+        "detectado": true,
+        "fecha": "2026-05-24",
+        "hora": "16:03:04",
+        "fecha_hora": "2026-05-24 16:03:04"
+    },
+    {
+        "id": 41,
+        "unidad": "ESP32-PRUEBA",
+        "sensor": "PRUEBA-SIN-SENSOR",
+        "estado": 1,
+        "detectado": false,
+        "fecha": "2026-05-24",
+        "hora": "16:03:08",
+        "fecha_hora": "2026-05-24 16:03:08"
+    },
+    {
+        "id": 42,
+        "unidad": "ESP32-PRUEBA",
+        "sensor": "PRUEBA-SIN-SENSOR",
+        "estado": 0,
+        "detectado": true,
+        "fecha": "2026-05-24",
+        "hora": "16:03:13",
+        "fecha_hora": "2026-05-24 16:03:13"
+    },
+    {
+        "id": 43,
+        "unidad": "ESP32-PRUEBA",
+        "sensor": "PRUEBA-SIN-SENSOR",
+        "estado": 1,
+        "detectado": false,
+        "fecha": "2026-05-24",
+        "hora": "16:03:18",
+        "fecha_hora": "2026-05-24 16:03:18"
+    },
+    {
+        "id": 44,
+        "unidad": "ESP32-PRUEBA",
+        "sensor": "PRUEBA-SIN-SENSOR",
+        "estado": 0,
+        "detectado": true,
+        "fecha": "2026-05-24",
+        "hora": "16:03:23",
+        "fecha_hora": "2026-05-24 16:03:23"
+    }
+]

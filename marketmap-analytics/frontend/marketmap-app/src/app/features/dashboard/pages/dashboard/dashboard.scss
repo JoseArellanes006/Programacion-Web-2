@@ -1,0 +1,216 @@
+/*
+  Estilos de la página de dashboard.
+*/
+
+.dashboard-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-width: 0;
+}
+
+/*
+  Encabezado principal.
+*/
+.dashboard-page__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+
+  h1 {
+    margin: 0;
+    color: var(--color-text);
+    font-size: 2rem;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+  }
+
+  p {
+    margin: 0.4rem 0 0;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+  }
+
+  small {
+    display: inline-flex;
+    margin-top: 0.45rem;
+    color: var(--color-text-muted);
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+
+  button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: 800;
+
+    mat-icon {
+      width: 20px;
+      height: 20px;
+      font-size: 20px;
+      line-height: 20px;
+    }
+  }
+}
+
+/*
+  Mensaje de error.
+*/
+.dashboard-page__error {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  background: #fef2f2;
+  color: var(--color-danger);
+  border: 1px solid #fecaca;
+  box-shadow: var(--shadow-soft);
+  font-weight: 800;
+
+  mat-icon {
+    width: 22px;
+    height: 22px;
+    font-size: 22px;
+    line-height: 22px;
+  }
+}
+
+/*
+  Estado de carga.
+*/
+.dashboard-page__loading {
+  min-height: 280px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 0.75rem;
+  padding: 2rem;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-soft);
+
+  p {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-weight: 700;
+  }
+}
+
+/*
+  Grid de KPI's.
+*/
+.dashboard-page__kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+  min-width: 0;
+}
+
+/*
+  Grid de gráficas.
+*/
+.dashboard-page__charts {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr;
+  gap: 1rem;
+  min-width: 0;
+}
+
+/*
+  Sección de tablas.
+*/
+.dashboard-page__tables {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+  min-width: 0;
+}
+
+/*
+  Tarjeta de tabla.
+*/
+.dashboard-page__table-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.25rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-soft);
+  min-width: 0;
+
+  header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+
+    h2 {
+      margin: 0;
+      color: var(--color-text);
+      font-size: 1.15rem;
+      font-weight: 900;
+    }
+
+    p {
+      margin: 0.25rem 0 0;
+      color: var(--color-text-muted);
+      line-height: 1.5;
+    }
+
+    mat-icon {
+      width: 26px;
+      height: 26px;
+      font-size: 26px;
+      line-height: 26px;
+      color: var(--color-primary);
+      flex: 0 0 auto;
+    }
+  }
+}
+
+/*
+  Ajustes para mat-card.
+*/
+:host ::ng-deep .dashboard-page__error.mat-mdc-card,
+:host ::ng-deep .dashboard-page__loading.mat-mdc-card,
+:host ::ng-deep .dashboard-page__table-card.mat-mdc-card {
+  box-shadow: var(--shadow-soft);
+}
+
+/*
+  Responsivo.
+*/
+@media (max-width: 1200px) {
+  .dashboard-page__kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dashboard-page__charts {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .dashboard-page__header {
+    flex-direction: column;
+
+    button {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  .dashboard-page__kpis {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-page__table-card {
+    padding: 1rem;
+  }
+}

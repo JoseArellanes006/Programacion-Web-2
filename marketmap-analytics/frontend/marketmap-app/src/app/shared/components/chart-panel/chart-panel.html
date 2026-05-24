@@ -1,0 +1,84 @@
+<!--
+  Panel de gráfica reutilizable.
+
+  Recibe un objeto ChartPanelData y representa sus datos
+  mediante barras horizontales simples.
+
+  Este componente no consulta directamente al backend.
+  Solo recibe información ya cargada por el componente padre.
+-->
+
+<mat-card class="chart-panel">
+  <!--
+    Encabezado de la gráfica.
+  -->
+  <header class="chart-panel__header">
+    <div class="chart-panel__title-group">
+      <div class="chart-panel__title-line">
+        <mat-icon class="chart-panel__icon">
+          monitoring
+        </mat-icon>
+
+        <h3>{{ title }}</h3>
+      </div>
+
+      @if (subtitle) {
+        <p>{{ subtitle }}</p>
+      }
+    </div>
+
+    @if (chartType) {
+      <span class="chart-panel__type">
+        {{ chartType }}
+      </span>
+    }
+  </header>
+
+  <!--
+    Estado vacío.
+  -->
+  @if (!hasData) {
+    <div class="chart-panel__empty">
+      <mat-icon>
+        bar_chart
+      </mat-icon>
+
+      <span>
+        {{ emptyMessage }}
+      </span>
+    </div>
+  }
+
+  <!--
+    Datos de la gráfica.
+  -->
+  @if (hasData) {
+    <div class="chart-panel__body">
+      @for (item of data; track trackDataPoint($index, item)) {
+        <div class="chart-panel__row">
+          <div class="chart-panel__label" [title]="item.label">
+            {{ item.label }}
+          </div>
+
+          <div
+            class="chart-panel__bar-track"
+            role="progressbar"
+            [attr.aria-label]="item.label"
+            [attr.aria-valuenow]="item.value"
+            aria-valuemin="0"
+            [attr.aria-valuemax]="maxValue"
+          >
+            <div
+              class="chart-panel__bar"
+              [style.width]="getBarWidth(item.value)"
+            ></div>
+          </div>
+
+          <div class="chart-panel__value">
+            {{ formatValue(item.value) }}
+          </div>
+        </div>
+      }
+    </div>
+  }
+</mat-card>

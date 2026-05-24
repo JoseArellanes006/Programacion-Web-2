@@ -1,0 +1,62 @@
+<!--
+  Diálogo de confirmación reutilizable.
+
+  Este componente no ejecuta acciones por sí mismo.
+  Solo emite eventos hacia el componente padre.
+-->
+
+@if (open) {
+  <div class="confirm-dialog">
+    <!--
+      Fondo oscuro.
+
+      Al hacer clic fuera del panel se cancela la acción.
+    -->
+    <div
+      class="confirm-dialog__backdrop"
+      (click)="cancel()"
+    ></div>
+
+    <!--
+      Panel del diálogo.
+    -->
+    <mat-card
+      class="confirm-dialog__panel"
+      role="dialog"
+      aria-modal="true"
+      [attr.aria-label]="title"
+    >
+      <header class="confirm-dialog__header">
+        <div [class]="iconClass">
+          <mat-icon>
+            {{ dialogIcon }}
+          </mat-icon>
+        </div>
+
+        <div class="confirm-dialog__title-group">
+          <h2>{{ title }}</h2>
+          <p>{{ message }}</p>
+        </div>
+      </header>
+
+      <footer class="confirm-dialog__footer">
+        <button
+          mat-stroked-button
+          type="button"
+          (click)="cancel()"
+        >
+          {{ cancelText }}
+        </button>
+
+        <button
+          mat-flat-button
+          type="button"
+          [color]="danger ? 'warn' : 'primary'"
+          (click)="confirm()"
+        >
+          {{ confirmText }}
+        </button>
+      </footer>
+    </mat-card>
+  </div>
+}

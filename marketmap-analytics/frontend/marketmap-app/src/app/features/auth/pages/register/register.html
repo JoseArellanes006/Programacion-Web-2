@@ -1,0 +1,138 @@
+<!--
+  Formulario de registro.
+-->
+
+<section class="register-page">
+  <header class="register-page__header">
+    <span>Crear cuenta</span>
+    <h2>Registro</h2>
+    <p>Complete los datos para crear una cuenta en el sistema.</p>
+  </header>
+
+  <form class="register-page__form" (ngSubmit)="submit()">
+    <mat-form-field appearance="outline" class="register-page__field">
+      <mat-label>Nombre completo</mat-label>
+
+      <input
+        matInput
+        id="name"
+        name="name"
+        type="text"
+        placeholder="Nombre del usuario"
+        autocomplete="name"
+        [ngModel]="name()"
+        (ngModelChange)="name.set($event)"
+      />
+
+      <mat-icon matSuffix>person</mat-icon>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="register-page__field">
+      <mat-label>Correo electrónico</mat-label>
+
+      <input
+        matInput
+        id="email"
+        name="email"
+        type="email"
+        placeholder="usuario@correo.com"
+        autocomplete="email"
+        [ngModel]="email()"
+        (ngModelChange)="email.set($event)"
+      />
+
+      <mat-icon matSuffix>mail</mat-icon>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="register-page__field">
+      <mat-label>Rol inicial</mat-label>
+
+      <mat-select
+        id="role"
+        name="role"
+        [ngModel]="role()"
+        (ngModelChange)="role.set($event)"
+      >
+        @for (option of roleOptions; track option.value) {
+          <mat-option [value]="option.value">
+            {{ option.label }}
+          </mat-option>
+        }
+      </mat-select>
+
+      <mat-icon matSuffix>admin_panel_settings</mat-icon>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="register-page__field">
+      <mat-label>Contraseña</mat-label>
+
+      <input
+        matInput
+        id="password"
+        name="password"
+        type="password"
+        placeholder="Mínimo 8 caracteres"
+        autocomplete="new-password"
+        [ngModel]="password()"
+        (ngModelChange)="password.set($event)"
+      />
+
+      <mat-icon matSuffix>lock</mat-icon>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="register-page__field">
+      <mat-label>Confirmar contraseña</mat-label>
+
+      <input
+        matInput
+        id="confirmPassword"
+        name="confirmPassword"
+        type="password"
+        placeholder="Repita la contraseña"
+        autocomplete="new-password"
+        [ngModel]="confirmPassword()"
+        (ngModelChange)="confirmPassword.set($event)"
+      />
+
+      <mat-icon matSuffix>lock_reset</mat-icon>
+    </mat-form-field>
+
+    @if (errorMessage()) {
+      <div class="register-page__error">
+        <mat-icon>error_outline</mat-icon>
+        <span>{{ errorMessage() }}</span>
+      </div>
+    }
+
+    <button
+      mat-flat-button
+      color="primary"
+      class="register-page__submit"
+      type="submit"
+      [disabled]="loading()"
+    >
+      @if (loading()) {
+        <span class="register-page__button-content">
+          <mat-progress-spinner
+            mode="indeterminate"
+            diameter="20"
+          />
+
+          <span>Creando cuenta...</span>
+        </span>
+      } @else {
+        <span class="register-page__button-content">
+          <mat-icon>person_add</mat-icon>
+          <span>Crear cuenta</span>
+        </span>
+      }
+    </button>
+  </form>
+
+  <footer class="register-page__footer">
+    <span>
+      ¿Ya tiene cuenta?
+      <a routerLink="/auth/login">Iniciar sesión</a>
+    </span>
+  </footer>
+</section>

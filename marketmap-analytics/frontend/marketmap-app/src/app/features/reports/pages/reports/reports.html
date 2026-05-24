@@ -1,0 +1,375 @@
+<!--
+  Página de reportes PDF y Excel.
+
+  Los reportes son generados por FastAPI.
+  Angular solo envía filtros y descarga el archivo.
+-->
+
+<section class="reports-page">
+  <!--
+    Encabezado principal.
+  -->
+  <header class="reports-page__header">
+    <div>
+      <h1>Reportes</h1>
+      <p>
+        Genere reportes administrativos en formato PDF o Excel usando información real del sistema.
+      </p>
+    </div>
+  </header>
+
+  <!--
+    Mensaje de error.
+  -->
+  @if (errorMessage()) {
+    <div class="reports-page__error">
+      {{ errorMessage() }}
+    </div>
+  }
+
+  <section class="reports-page__content">
+    <!--
+      Panel de configuración.
+    -->
+    <mat-card class="reports-form">
+      <form (ngSubmit)="downloadReport()">
+        <header class="reports-form__header">
+          <h2>Configuración del reporte</h2>
+          <p>
+            Seleccione el tipo de reporte, formato y filtros opcionales.
+          </p>
+        </header>
+
+        <mat-divider />
+
+        <!--
+          Tipo de reporte.
+        -->
+        <section class="reports-form__section">
+          <h3>Tipo de reporte</h3>
+
+          <div class="reports-form__options">
+            @for (option of reportTypeOptions; track option.value) {
+              <button
+                mat-stroked-button
+                type="button"
+                class="report-option"
+                [class.report-option--active]="reportType() === option.value"
+                (click)="updateReportType(option.value)"
+                [disabled]="downloading() || loading()"
+              >
+                <mat-icon>{{ option.icon }}</mat-icon>
+
+                <span class="report-option__content">
+                  <strong>{{ option.label }}</strong>
+                  <small>{{ option.description }}</small>
+                </span>
+              </button>
+            }
+          </div>
+        </section>
+
+        <mat-divider />
+
+        <!--
+          Formato.
+        -->
+        <section class="reports-form__section">
+          <h3>Formato</h3>
+
+          <mat-button-toggle-group
+            class="reports-form__format-grid"
+            [ngModel]="format()"
+            (ngModelChange)="updateFormat($event)"
+            name="format"
+            [disabled]="downloading() || loading()"
+          >
+            @for (option of formatOptions; track option.value) {
+              <mat-button-toggle [value]="option.value">
+                <mat-icon>{{ option.icon }}</mat-icon>
+
+                <span>
+                  <strong>{{ option.label }}</strong>
+                  <small>.{{ option.extension }}</small>
+                </span>
+              </mat-button-toggle>
+            }
+          </mat-button-toggle-group>
+        </section>
+
+        <mat-divider />
+
+        <!--
+          Filtros.
+        -->
+        <section class="reports-form__section">
+          <h3>Filtros</h3>
+
+          <p class="reports-form__hint">
+            Los filtros se envían al backend para generar el archivo con datos reales.
+          </p>
+
+          <div class="reports-form__grid">
+            <!--
+              Fecha inicial.
+
+              Aquí ya NO se llama a funciones en [ngModel].
+              Se usa directamente startDatePickerValue().
+            -->
+            <mat-form-field appearance="outline">
+              <mat-label>Fecha inicial</mat-label>
+
+              <input
+                matInput
+                id="startDate"
+                placeholder="Seleccione fecha inicial"
+                [matDatepicker]="startDatePicker"
+                [ngModel]="startDatePickerValue()"
+                (dateChange)="updateStartDate($event.value)"
+                name="startDate"
+                [disabled]="downloading() || loading()"
+                readonly
+              />
+
+              <mat-datepicker-toggle
+                matIconSuffix
+                [for]="startDatePicker"
+              />
+
+              <mat-datepicker #startDatePicker />
+            </mat-form-field>
+
+            <!--
+              Fecha final.
+
+              Aquí ya NO se llama a funciones en [ngModel].
+              Se usa directamente endDatePickerValue().
+            -->
+            <mat-form-field appearance="outline">
+              <mat-label>Fecha final</mat-label>
+
+              <input
+                matInput
+                id="endDate"
+                placeholder="Seleccione fecha final"
+                [matDatepicker]="endDatePicker"
+                [ngModel]="endDatePickerValue()"
+                (dateChange)="updateEndDate($event.value)"
+                name="endDate"
+                [disabled]="downloading() || loading()"
+                readonly
+              />
+
+              <mat-datepicker-toggle
+                matIconSuffix
+                [for]="endDatePicker"
+              />
+
+              <mat-datepicker #endDatePicker />
+            </mat-form-field>
+
+            <!--
+              Categoría.
+
+              Solo se usa en ventas y productos.
+              En pedidos no aplica porque el backend de pedidos filtra por estado, fecha y búsqueda.
+            -->
+            @if (usesCategoryFilter()) {
+              <mat-form-field appearance="outline">
+                <mat-label>Categoría</mat-label>
+
+                <mat-select
+                  id="category"
+                  [ngModel]="category()"
+                  (ngModelChange)="category.set($event)"
+                  name="category"
+                  [disabled]="downloading() || loading()"
+                >
+                  <mat-option value="">
+                    Todas las categorías
+                  </mat-option>
+
+                  @for (item of categoryOptions(); track item.id) {
+                    <mat-option [value]="item.name">
+                      {{ item.name }}
+                    </mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+            }
+
+            <!--
+              Estado del pedido.
+
+              Solo aplica para reporte de pedidos.
+            -->
+            @if (reportType() === 'ORDERS') {
+              <mat-form-field appearance="outline">
+                <mat-label>Estado del pedido</mat-label>
+
+                <mat-select
+                  id="orderStatus"
+                  [ngModel]="orderStatus()"
+                  (ngModelChange)="orderStatus.set($event)"
+                  name="orderStatus"
+                  [disabled]="downloading() || loading()"
+                >
+                  @for (status of orderStatusOptions; track status.value) {
+                    <mat-option [value]="status.value">
+                      {{ status.label }}
+                    </mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+            }
+
+            <!--
+              Búsqueda.
+
+              Según el tipo de reporte:
+              - Ventas: cliente, folio, producto o categoría.
+              - Productos: nombre, descripción o categoría.
+              - Pedidos: folio, cliente, producto o estado.
+            -->
+            <mat-form-field
+              appearance="outline"
+              class="reports-form__search"
+            >
+              <mat-label>Búsqueda</mat-label>
+
+              <input
+                matInput
+                id="search"
+                type="text"
+                [placeholder]="searchPlaceholder()"
+                [ngModel]="search()"
+                (ngModelChange)="search.set($event)"
+                name="search"
+                [disabled]="downloading() || loading()"
+              />
+
+              <mat-icon matSuffix>search</mat-icon>
+            </mat-form-field>
+          </div>
+        </section>
+
+        <mat-divider />
+
+        <!--
+          Resumen de filtros.
+        -->
+        <section class="reports-form__summary">
+          <article>
+            <span>Reporte</span>
+
+            <strong>
+              @if (reportType() === 'SALES') {
+                Ventas
+              } @else if (reportType() === 'PRODUCTS') {
+                Productos
+              } @else {
+                Pedidos
+              }
+            </strong>
+          </article>
+
+          <article>
+            <span>Formato</span>
+            <strong>{{ format() }}</strong>
+          </article>
+
+          <article>
+            <span>Periodo</span>
+
+            <strong>
+              {{ startDate() || 'Sin inicio' }} — {{ endDate() || 'Sin fin' }}
+            </strong>
+          </article>
+        </section>
+
+        <mat-divider />
+
+        <!--
+          Acciones.
+        -->
+        <div class="reports-form__actions">
+          <button
+            mat-flat-button
+            color="primary"
+            type="submit"
+            [disabled]="downloading() || loading()"
+          >
+            <mat-icon>
+              {{ downloading() ? 'hourglass_empty' : 'download' }}
+            </mat-icon>
+
+            <span>
+              {{ downloading() ? 'Generando...' : 'Descargar reporte' }}
+            </span>
+          </button>
+
+          <button
+            mat-stroked-button
+            type="button"
+            (click)="clearFilters()"
+            [disabled]="downloading() || loading()"
+          >
+            <mat-icon>cleaning_services</mat-icon>
+            Limpiar filtros
+          </button>
+        </div>
+      </form>
+    </mat-card>
+
+    <!--
+      Panel informativo.
+    -->
+    <mat-card class="reports-info">
+      <header>
+        <span>Exportación</span>
+        <h2>Generación desde backend</h2>
+
+        <p>
+          Los archivos se generan en FastAPI usando la información real almacenada en MongoDB.
+        </p>
+      </header>
+
+      <mat-divider />
+
+      <div class="reports-info__list">
+        <article>
+          <mat-icon>picture_as_pdf</mat-icon>
+
+          <div>
+            <strong>PDF</strong>
+            <p>
+              Útil para imprimir, entregar evidencia o compartir reportes administrativos.
+            </p>
+          </div>
+        </article>
+
+        <article>
+          <mat-icon>table_chart</mat-icon>
+
+          <div>
+            <strong>Excel</strong>
+            <p>
+              Útil para análisis, filtros, cruces de información y revisión detallada.
+            </p>
+          </div>
+        </article>
+
+        <article>
+          <mat-icon>filter_alt</mat-icon>
+
+          <div>
+            <strong>Filtros reales</strong>
+            <p>
+              Las fechas, categorías, estados y búsquedas se envían como parámetros al backend.
+            </p>
+          </div>
+        </article>
+      </div>
+    </mat-card>
+  </section>
+</section>

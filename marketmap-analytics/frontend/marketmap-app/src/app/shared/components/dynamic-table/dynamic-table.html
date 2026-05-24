@@ -1,0 +1,151 @@
+<!--
+  Tabla dinámica reutilizable.
+
+  Renderiza columnas y datos según la configuración recibida desde el componente padre.
+
+  Este componente no consulta el backend directamente.
+-->
+
+<mat-card class="dynamic-table">
+  <!--
+    Estado de carga.
+  -->
+  @if (loading) {
+    <div class="dynamic-table__state">
+      <mat-progress-spinner
+        mode="indeterminate"
+        diameter="38"
+      />
+
+      <p>Cargando información...</p>
+    </div>
+  }
+
+  <!--
+    Estado vacío.
+  -->
+  @if (!loading && (!hasColumns || !hasRows)) {
+    <div class="dynamic-table__state">
+      <mat-icon>
+        table_rows
+      </mat-icon>
+
+      <strong>Sin registros</strong>
+      <p>{{ emptyMessage }}</p>
+    </div>
+  }
+
+  <!--
+    Tabla con información.
+  -->
+  @if (!loading && hasColumns && hasRows) {
+    <div class="dynamic-table__scroll">
+      <table>
+        <thead>
+          <tr>
+            @for (column of columns; track trackColumn($index, column)) {
+              <th
+                [style.width]="column.width"
+                [class]="getColumnClasses(column)"
+                [class.dynamic-table__sortable]="column.sortable"
+                (click)="toggleSort(column)"
+              >
+                <span class="dynamic-table__header-content">
+                  {{ column.label }}
+
+                  @if (getSortIcon(column)) {
+                    <mat-icon>
+                      {{ getSortIcon(column) }}
+                    </mat-icon>
+                  }
+                </span>
+              </th>
+            }
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (row of rows; track trackRow($index)) {
+            <tr>
+              @for (column of columns; track trackColumn($index, column)) {
+                <td [class]="getColumnClasses(column)">
+                  <!--
+                    Columna de imagen.
+                  -->
+                  @if (column.type === 'image') {
+                    <img
+                      class="dynamic-table__image"
+                      [src]="getImageSource(row, column)"
+                      [alt]="getImageAlt(row, column)"
+                    />
+                  }
+
+                  <!--
+                    Columna de estado.
+                  -->
+                  @else if (column.type === 'status') {
+                    <span [class]="getStatusClass(row, column)">
+                      {{ formatCellValue(row, column) }}
+                    </span>
+                  }
+
+                  <!--
+                    Columna booleana.
+                  -->
+                  @else if (column.type === 'boolean') {
+                    <span
+                      class="dynamic-table__boolean"
+                      [class.dynamic-table__boolean--true]="getCellValue(row, column.key)"
+                      [class.dynamic-table__boolean--false]="!getCellValue(row, column.key)"
+                    >
+                      <mat-icon>
+                        {{ getCellValue(row, column.key) ? 'check_circle' : 'cancel' }}
+                      </mat-icon>
+
+                      {{ formatCellValue(row, column) }}
+                    </span>
+                  }
+
+                  <!--
+                    Columna de acciones.
+                  -->
+                  @else if (column.type === 'actions') {
+                    <div class="dynamic-table__actions">
+                      @for (action of column.actions ?? []; track action.key) {
+                        @if (isActionVisible(action, row)) {
+                          <button
+                            mat-icon-button
+                            type="button"
+                            class="dynamic-table__action"
+                            [class.dynamic-table__action--danger]="action.danger"
+                            [class.dynamic-table__action--primary]="action.primary"
+                            [disabled]="isActionDisabled(action, row)"
+                            [matTooltip]="getActionTooltip(action)"
+                            (click)="emitAction(action, row)"
+                          >
+                            <mat-icon>
+                              {{ getActionIcon(action) }}
+                            </mat-icon>
+                          </button>
+                        }
+                      }
+                    </div>
+                  }
+
+                  <!--
+                    Cualquier otro tipo de columna.
+                  -->
+                  @else {
+                    <span class="dynamic-table__text">
+                      {{ formatCellValue(row, column) }}
+                    </span>
+                  }
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</mat-card>

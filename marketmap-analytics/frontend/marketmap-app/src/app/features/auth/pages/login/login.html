@@ -1,0 +1,103 @@
+<!--
+  Formulario de inicio de sesión.
+
+  Incluye:
+  - login tradicional con correo y contraseña
+  - login real con Google Identity Services
+-->
+
+<section class="login-page">
+  <header class="login-page__header">
+    <span>Acceso al sistema</span>
+    <h2>Iniciar sesión</h2>
+    <p>Ingrese sus credenciales para acceder al panel de control.</p>
+  </header>
+
+  <form class="login-page__form" (ngSubmit)="submit()">
+    <mat-form-field appearance="outline" class="login-page__field">
+      <mat-label>Correo electrónico</mat-label>
+
+      <input
+        matInput
+        id="email"
+        name="email"
+        type="email"
+        placeholder="usuario@correo.com"
+        autocomplete="email"
+        [ngModel]="email()"
+        (ngModelChange)="email.set($event)"
+      />
+
+      <mat-icon matSuffix>mail</mat-icon>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="login-page__field">
+      <mat-label>Contraseña</mat-label>
+
+      <input
+        matInput
+        id="password"
+        name="password"
+        type="password"
+        placeholder="Ingrese su contraseña"
+        autocomplete="current-password"
+        [ngModel]="password()"
+        (ngModelChange)="password.set($event)"
+      />
+
+      <mat-icon matSuffix>lock</mat-icon>
+    </mat-form-field>
+
+    @if (errorMessage()) {
+      <div class="login-page__error">
+        <mat-icon>error_outline</mat-icon>
+        <span>{{ errorMessage() }}</span>
+      </div>
+    }
+
+    <button
+      mat-flat-button
+      color="primary"
+      class="login-page__submit"
+      type="submit"
+      [disabled]="loading() || googleLoading()"
+    >
+      @if (loading()) {
+        <span class="login-page__button-content">
+          <mat-progress-spinner
+            mode="indeterminate"
+            diameter="20"
+          />
+
+          <span>Iniciando sesión...</span>
+        </span>
+      } @else {
+        <span class="login-page__button-content">
+          <mat-icon>login</mat-icon>
+          <span>Iniciar sesión</span>
+        </span>
+      }
+    </button>
+
+    <div class="login-page__google-wrapper">
+      <div #googleButtonContainer class="login-page__google-official"></div>
+
+      @if (googleLoading()) {
+        <p class="login-page__google-loading">
+          Validando cuenta de Google...
+        </p>
+      }
+    </div>
+  </form>
+
+  <footer class="login-page__footer">
+    <a routerLink="/auth/forgot-password">
+      Olvidé mi contraseña
+    </a>
+
+    <span>
+      ¿No tiene cuenta?
+      <a routerLink="/auth/register">Registrarse</a>
+    </span>
+  </footer>
+</section>

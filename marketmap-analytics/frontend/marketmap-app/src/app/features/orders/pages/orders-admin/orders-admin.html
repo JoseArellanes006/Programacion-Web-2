@@ -1,0 +1,273 @@
+<!--
+  Página administrativa de pedidos y ventas.
+-->
+
+<section class="orders-admin-page">
+  <!--
+    Encabezado principal.
+  -->
+  <header class="orders-admin-page__header">
+    <div>
+      <h1>Pedidos y ventas</h1>
+      <p>
+        Consulte pedidos, revise ventas recientes y administre el estado de cada operación.
+      </p>
+    </div>
+
+    <button
+      mat-stroked-button
+      type="button"
+      (click)="loadOrders()"
+      [disabled]="loading() || processing()"
+    >
+      <mat-icon>refresh</mat-icon>
+      Actualizar
+    </button>
+  </header>
+
+  <!--
+    Filtros.
+  -->
+  <mat-card class="orders-admin-page__filters">
+    <mat-form-field appearance="outline">
+      <mat-label>Buscar</mat-label>
+
+      <input
+        matInput
+        id="orderSearch"
+        type="text"
+        placeholder="Folio, cliente o id"
+        [ngModel]="searchText()"
+        (ngModelChange)="updateSearchText($event)"
+      />
+
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Estado</mat-label>
+
+      <mat-select
+        id="orderStatus"
+        [ngModel]="selectedStatus()"
+        (ngModelChange)="updateStatus($event)"
+      >
+        @for (status of statusOptions; track status.value) {
+          <mat-option [value]="status.value">
+            {{ status.label }}
+          </mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Fecha inicial</mat-label>
+
+      <input
+        matInput
+        id="startDate"
+        placeholder="Seleccione fecha inicial"
+        [matDatepicker]="startDatePicker"
+        [ngModel]="getDatePickerValue(startDate())"
+        (dateChange)="updateStartDate(formatDateValue($event.value))"
+        [disabled]="loading() || processing()"
+        readonly
+      />
+
+      <mat-datepicker-toggle
+        matIconSuffix
+        [for]="startDatePicker"
+      />
+
+      <mat-datepicker #startDatePicker />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Fecha final</mat-label>
+
+      <input
+        matInput
+        id="endDate"
+        placeholder="Seleccione fecha final"
+        [matDatepicker]="endDatePicker"
+        [ngModel]="getDatePickerValue(endDate())"
+        (dateChange)="updateEndDate(formatDateValue($event.value))"
+        [disabled]="loading() || processing()"
+        readonly
+      />
+
+      <mat-datepicker-toggle
+        matIconSuffix
+        [for]="endDatePicker"
+      />
+
+      <mat-datepicker #endDatePicker />
+    </mat-form-field>
+
+    <div class="orders-admin-page__filter-actions">
+      <button
+        mat-flat-button
+        color="primary"
+        type="button"
+        (click)="searchWithBackendFilters()"
+        [disabled]="loading() || processing()"
+      >
+        <mat-icon>filter_alt</mat-icon>
+        Aplicar
+      </button>
+
+      <button
+        mat-stroked-button
+        type="button"
+        (click)="clearFilters()"
+        [disabled]="loading() || processing()"
+      >
+        <mat-icon>cleaning_services</mat-icon>
+        Limpiar
+      </button>
+    </div>
+  </mat-card>
+
+  <!--
+    Mensaje de error.
+  -->
+  @if (errorMessage()) {
+    <div class="orders-admin-page__error">
+      {{ errorMessage() }}
+    </div>
+  }
+
+  <!--
+    Indicador de carga.
+  -->
+  @if (loading()) {
+    <div class="orders-admin-page__loading">
+      <mat-progress-spinner
+        mode="indeterminate"
+        diameter="28"
+      />
+
+      <span>Cargando pedidos...</span>
+    </div>
+  }
+
+  <!--
+    Tabla de pedidos.
+  -->
+  <app-dynamic-table
+    [columns]="columns"
+    [data]="orders()"
+    [loading]="loading()"
+    emptyMessage="No hay pedidos registrados."
+    (tableAction)="handleTableAction($event)"
+  />
+
+  <!--
+    Panel de detalle del pedido.
+  -->
+  @if (detailOpen() && selectedOrder()) {
+    <div class="order-detail">
+      <div class="order-detail__backdrop" (click)="closeDetail()"></div>
+
+      <aside class="order-detail__panel">
+        <header class="order-detail__header">
+          <div>
+            <span>Detalle del pedido</span>
+            <h2>{{ selectedOrder()?.folio }}</h2>
+            <p>{{ selectedOrder()?.customerName }}</p>
+          </div>
+
+          <button
+            mat-icon-button
+            type="button"
+            aria-label="Cerrar detalle"
+            (click)="closeDetail()"
+          >
+            <mat-icon>close</mat-icon>
+          </button>
+        </header>
+
+        <section class="order-detail__summary">
+          <div>
+            <span>Estado</span>
+
+            <mat-chip>
+              {{ getStatusLabel(selectedOrder()!.status) }}
+            </mat-chip>
+          </div>
+
+          <div>
+            <span>Método de pago</span>
+            <strong>{{ selectedOrder()?.paymentMethod }}</strong>
+          </div>
+
+          <div>
+            <span>Fecha</span>
+            <strong>{{ selectedOrder()?.createdAt | date:'medium' }}</strong>
+          </div>
+        </section>
+
+        <mat-divider />
+
+        <section class="order-detail__items">
+          <h3>Productos</h3>
+
+          @for (item of selectedOrder()?.details ?? []; track item.id) {
+            <article class="order-detail-item">
+              <div class="order-detail-item__main">
+                <strong>{{ item.productName }}</strong>
+                <span>{{ item.category || 'Sin categoría' }}</span>
+              </div>
+
+              <div class="order-detail-item__amounts">
+                <span>
+                  {{ item.quantity }} × {{ item.unitPrice | currencyFormat }}
+                </span>
+
+                <strong>{{ item.subtotal | currencyFormat }}</strong>
+              </div>
+            </article>
+          }
+        </section>
+
+        <mat-divider />
+
+        <section class="order-detail__totals">
+          <div>
+            <span>Subtotal</span>
+            <strong>{{ selectedOrder()?.subtotal | currencyFormat }}</strong>
+          </div>
+
+          <div>
+            <span>Impuestos</span>
+            <strong>{{ selectedOrder()?.tax | currencyFormat }}</strong>
+          </div>
+
+          <div>
+            <span>Descuento</span>
+            <strong>-{{ selectedOrder()?.discount | currencyFormat }}</strong>
+          </div>
+
+          <div class="order-detail__total">
+            <span>Total</span>
+            <strong>{{ selectedOrder()?.total | currencyFormat }}</strong>
+          </div>
+        </section>
+      </aside>
+    </div>
+  }
+
+  <!--
+    Confirmación para cancelar pedido.
+  -->
+  <app-confirm-dialog
+    [open]="cancelConfirmOpen()"
+    title="Cancelar pedido"
+    [message]="'¿Está seguro de cancelar el pedido ' + (selectedOrder()?.folio ?? '') + '?'"
+    confirmText="Cancelar pedido"
+    cancelText="Volver"
+    [danger]="true"
+    (confirmed)="confirmCancelOrder()"
+    (cancelled)="closeCancelConfirm()"
+  />
+</section>

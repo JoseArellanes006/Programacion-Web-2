@@ -1,0 +1,267 @@
+<!--
+  Página de carrito de compras.
+-->
+
+<section class="cart-page">
+  <!--
+    Encabezado principal.
+  -->
+  <header class="cart-page__header">
+    <div>
+      <h1>Carrito de compras</h1>
+      <p>
+        Revise los productos agregados antes de confirmar su pedido.
+      </p>
+    </div>
+
+    <button
+      class="btn btn-outline"
+      type="button"
+      (click)="loadCart()"
+      [disabled]="loading() || processing()"
+    >
+      Actualizar
+    </button>
+  </header>
+
+  <!--
+    Mensaje de error.
+  -->
+  @if (errorMessage()) {
+    <div class="cart-page__error">
+      {{ errorMessage() }}
+    </div>
+  }
+
+  <!--
+    Estado de carga.
+  -->
+  @if (loading()) {
+    <div class="cart-page__loading">
+      <span></span>
+      <p>Cargando carrito...</p>
+    </div>
+  }
+
+  <!--
+    Estado vacío.
+  -->
+  @if (!loading() && cartService.isEmpty()) {
+    <div class="cart-page__empty">
+      <strong>El carrito está vacío</strong>
+      <p>Agregue productos desde el catálogo para iniciar una compra.</p>
+    </div>
+  }
+
+  <!--
+    Contenido del carrito.
+  -->
+  @if (!loading() && !cartService.isEmpty()) {
+    <section class="cart-page__content">
+      <!--
+        Lista de productos.
+      -->
+      <div class="cart-page__items">
+        @for (item of cartService.items(); track item.id) {
+          <article class="cart-item">
+            <div class="cart-item__image">
+              @if (item.imageUrl) {
+                <img [src]="item.imageUrl" [alt]="item.productName" />
+              } @else {
+                <span>IMG</span>
+              }
+            </div>
+
+            <div class="cart-item__info">
+              <small>{{ item.category || 'Sin categoría' }}</small>
+              <h2>{{ item.productName }}</h2>
+
+              @if (!item.available) {
+                <p class="cart-item__warning">
+                  Este producto ya no está disponible.
+                </p>
+              }
+
+              @if (item.availableStock !== undefined && item.availableStock !== null) {
+                <p>
+                  Stock disponible: {{ item.availableStock }}
+                </p>
+              }
+            </div>
+
+            <div class="cart-item__price">
+              <span>Precio</span>
+              <strong>{{ item.unitPrice | currencyFormat }}</strong>
+            </div>
+
+            <div class="cart-item__quantity">
+              <span>Cantidad</span>
+
+              <div class="cart-item__quantity-controls">
+                <button
+                  type="button"
+                  (click)="decreaseQuantity(item)"
+                  [disabled]="processing() || item.quantity <= 1"
+                >
+                  -
+                </button>
+
+                <strong>{{ item.quantity }}</strong>
+
+                <button
+                  type="button"
+                  (click)="increaseQuantity(item)"
+                  [disabled]="isIncreaseDisabled(item)"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
+            <div class="cart-item__subtotal">
+              <span>Subtotal</span>
+              <strong>{{ item.subtotal | currencyFormat }}</strong>
+            </div>
+
+            <button
+              class="cart-item__remove"
+              type="button"
+              (click)="removeItem(item)"
+              [disabled]="processing()"
+            >
+              Eliminar
+            </button>
+          </article>
+        }
+      </div>
+
+      <!--
+        Resumen del carrito.
+      -->
+      <aside class="cart-summary">
+        <header>
+          <h2>Resumen</h2>
+          <p>Totales calculados por el backend.</p>
+        </header>
+
+        @if (cartService.hasUnavailableItems()) {
+          <div class="cart-summary__warning">
+            Hay productos no disponibles. Elimínelos antes de confirmar la compra.
+          </div>
+        }
+
+        <div class="cart-summary__row">
+          <span>Productos</span>
+          <strong>{{ cartService.totalItems() }}</strong>
+        </div>
+
+        <div class="cart-summary__row">
+          <span>Subtotal</span>
+          <strong>{{ cartService.subtotal() | currencyFormat }}</strong>
+        </div>
+
+        <div class="cart-summary__row">
+          <span>Impuestos</span>
+          <strong>{{ cartService.tax() | currencyFormat }}</strong>
+        </div>
+
+        <div class="cart-summary__row">
+          <span>Descuento</span>
+          <strong>-{{ cartService.discount() | currencyFormat }}</strong>
+        </div>
+
+        <div class="cart-summary__total">
+          <span>Total</span>
+          <strong>{{ cartService.total() | currencyFormat }}</strong>
+        </div>
+
+        <!--
+          Método de pago.
+
+          No hay ningún método seleccionado por defecto.
+          El usuario debe elegir uno para habilitar la compra.
+        -->
+        <section class="cart-summary__payment">
+          <div class="cart-summary__payment-header">
+            <h3>Método de pago</h3>
+
+            @if (!selectedPaymentMethod()) {
+              <small>Seleccione una opción para continuar.</small>
+            } @else {
+              <small>Método seleccionado: {{ getSelectedPaymentLabel() }}</small>
+            }
+          </div>
+
+          <div class="cart-summary__payment-options">
+            @for (paymentMethod of paymentMethods; track paymentMethod.value) {
+              <button
+                type="button"
+                class="cart-summary__payment-option"
+                [class.cart-summary__payment-option--selected]="selectedPaymentMethod() === paymentMethod.value"
+                (click)="selectPaymentMethod(paymentMethod.value)"
+                [disabled]="processing()"
+              >
+                <strong>{{ paymentMethod.label }}</strong>
+                <span>{{ paymentMethod.description }}</span>
+              </button>
+            }
+          </div>
+        </section>
+
+        <div class="cart-summary__actions">
+          <button
+            class="btn btn-primary"
+            type="button"
+            (click)="openCheckoutConfirm()"
+            [disabled]="isCheckoutDisabled()"
+          >
+            Confirmar compra
+          </button>
+
+          @if (!selectedPaymentMethod()) {
+            <small class="cart-summary__payment-required">
+              Para confirmar la compra debe seleccionar un método de pago.
+            </small>
+          }
+
+          <button
+            class="btn btn-outline"
+            type="button"
+            (click)="openClearConfirm()"
+            [disabled]="processing()"
+          >
+            Limpiar carrito
+          </button>
+        </div>
+      </aside>
+    </section>
+  }
+
+  <!--
+    Confirmación para limpiar carrito.
+  -->
+  <app-confirm-dialog
+    [open]="clearConfirmOpen()"
+    title="Limpiar carrito"
+    message="¿Está seguro de eliminar todos los productos del carrito?"
+    confirmText="Limpiar"
+    cancelText="Cancelar"
+    [danger]="true"
+    (confirmed)="confirmClearCart()"
+    (cancelled)="closeClearConfirm()"
+  />
+
+  <!--
+    Confirmación para finalizar compra.
+  -->
+  <app-confirm-dialog
+    [open]="checkoutConfirmOpen()"
+    title="Confirmar compra"
+    [message]="'¿Desea confirmar la compra con método de pago: ' + getSelectedPaymentLabel() + '?'"
+    confirmText="Confirmar compra"
+    cancelText="Cancelar"
+    [danger]="false"
+    (confirmed)="confirmCheckout()"
+    (cancelled)="closeCheckoutConfirm()"
+  />
+</section>

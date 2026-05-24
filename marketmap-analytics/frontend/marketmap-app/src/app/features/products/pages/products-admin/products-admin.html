@@ -1,0 +1,117 @@
+<!--
+  Página de administración de productos.
+-->
+
+<section class="products-admin-page">
+  <!--
+    Encabezado principal.
+  -->
+  <header class="products-admin-page__header">
+    <div>
+      <h1>Productos</h1>
+      <p>
+        Administre el catálogo de productos, precios, inventario y disponibilidad.
+      </p>
+    </div>
+
+    <button
+      mat-flat-button
+      color="primary"
+      type="button"
+      (click)="openCreateDialog()"
+      [disabled]="loading()"
+    >
+      <mat-icon>add</mat-icon>
+      Nuevo producto
+    </button>
+  </header>
+
+  <!--
+    Filtros.
+  -->
+  <section class="products-admin-page__filters">
+    <mat-form-field appearance="outline">
+      <mat-label>Buscar producto</mat-label>
+
+      <input
+        matInput
+        id="productSearch"
+        type="text"
+        placeholder="Buscar por nombre, descripción o categoría"
+        [ngModel]="searchText()"
+        (ngModelChange)="updateSearchText($event)"
+      />
+
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Categoría</mat-label>
+
+      <mat-select
+        id="productCategory"
+        [ngModel]="selectedCategory()"
+        (ngModelChange)="updateCategory($event)"
+      >
+        @for (category of categories(); track category) {
+          <mat-option [value]="category">
+            @if (category === 'ALL') {
+              Todas
+            } @else {
+              {{ category }}
+            }
+          </mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </section>
+
+  <!--
+    Indicador superior de carga.
+  -->
+  @if (loading()) {
+    <div class="products-admin-page__loading">
+      <mat-progress-spinner
+        mode="indeterminate"
+        diameter="28"
+      />
+
+      <span>Procesando información...</span>
+    </div>
+  }
+
+  <!--
+    Tabla de productos.
+  -->
+  <app-dynamic-table
+    [columns]="columns"
+    [data]="products()"
+    [loading]="loading()"
+    emptyMessage="No hay productos registrados."
+    (tableAction)="handleTableAction($event)"
+  />
+
+  <!--
+    Diálogo dinámico para crear o editar producto.
+  -->
+  <app-dynamic-dialog
+    [open]="dialogOpen()"
+    [config]="dialogConfig()"
+    (confirmed)="handleDialogConfirm($event)"
+    (closed)="closeDialog()"
+  />
+
+  <!--
+    Diálogo de confirmación para eliminar producto.
+  -->
+  <app-confirm-dialog
+    [open]="confirmOpen()"
+    title="Eliminar producto"
+    [message]="'¿Está seguro de eliminar el producto ' + (selectedProduct()?.name ?? '') + '?'"
+    confirmText="Eliminar"
+    cancelText="Cancelar"
+    [danger]="true"
+    (confirmed)="confirmDelete()"
+    (cancelled)="closeConfirmDialog()"
+  />
+</section>

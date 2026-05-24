@@ -1,0 +1,124 @@
+<!--
+  Página de dashboard.
+
+  Muestra el resumen operativo y comercial del sistema.
+-->
+
+<section class="dashboard-page">
+  <!--
+    Encabezado principal.
+  -->
+  <header class="dashboard-page__header">
+    <div>
+      <h1>Dashboard</h1>
+
+      <p>
+        Resumen general de ventas, pedidos, productos y actividad operativa.
+      </p>
+
+      @if (generatedAt()) {
+        <small>
+          Última actualización: {{ generatedAt() }}
+        </small>
+      }
+    </div>
+
+    <button
+      mat-stroked-button
+      color="primary"
+      type="button"
+      (click)="loadDashboard()"
+      [disabled]="loading()"
+    >
+      <mat-icon>refresh</mat-icon>
+      Actualizar
+    </button>
+  </header>
+
+  <!--
+    Mensaje de error.
+  -->
+  @if (errorMessage()) {
+    <mat-card class="dashboard-page__error">
+      <mat-icon>error_outline</mat-icon>
+      <span>{{ errorMessage() }}</span>
+    </mat-card>
+  }
+
+  <!--
+    Estado de carga.
+  -->
+  @if (loading()) {
+    <mat-card class="dashboard-page__loading">
+      <mat-progress-spinner
+        mode="indeterminate"
+        diameter="42"
+      />
+
+      <p>Cargando dashboard...</p>
+    </mat-card>
+  }
+
+  <!--
+    Contenido principal.
+  -->
+  @if (!loading() && summary()) {
+    <!--
+      Tarjetas KPI.
+    -->
+    <section class="dashboard-page__kpis">
+      @for (kpi of kpis(); track kpi.title) {
+        <app-kpi-card [kpi]="kpi" />
+      }
+    </section>
+
+    <!--
+      Gráficas principales.
+    -->
+    <section class="dashboard-page__charts">
+      <app-chart-panel [chart]="salesChart()" />
+      <app-chart-panel [chart]="categoryChart()" />
+      <app-chart-panel [chart]="zoneChart()" />
+    </section>
+
+    <!--
+      Tablas resumen.
+    -->
+    <section class="dashboard-page__tables">
+      <mat-card class="dashboard-page__table-card">
+        <header>
+          <div>
+            <h2>Productos más vendidos</h2>
+            <p>Ranking de productos con mayor movimiento.</p>
+          </div>
+
+          <mat-icon>inventory_2</mat-icon>
+        </header>
+
+        <app-dynamic-table
+          [columns]="topProductColumns"
+          [data]="topProducts()"
+          emptyMessage="No hay productos vendidos para mostrar."
+        />
+      </mat-card>
+
+      <mat-card class="dashboard-page__table-card">
+        <header>
+          <div>
+            <h2>Pedidos recientes</h2>
+            <p>Últimos pedidos registrados en el sistema.</p>
+          </div>
+
+          <mat-icon>receipt_long</mat-icon>
+        </header>
+
+        <app-dynamic-table
+          [columns]="recentOrderColumns"
+          [data]="recentOrders()"
+          emptyMessage="No hay pedidos recientes."
+          (tableAction)="handleOrderAction($event)"
+        />
+      </mat-card>
+    </section>
+  }
+</section>

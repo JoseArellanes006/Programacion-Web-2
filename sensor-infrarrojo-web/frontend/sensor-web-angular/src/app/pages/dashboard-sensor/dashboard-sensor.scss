@@ -1,0 +1,354 @@
+/*
+  ============================================================
+  ESTILOS DEL DASHBOARD
+  ============================================================
+
+  Este archivo define la apariencia visual de la pantalla.
+
+  Se usa SCSS, que permite escribir CSS de forma más organizada.
+
+  Aquí se definen estilos para:
+
+  - Barra superior.
+  - Contenedor principal.
+  - Tarjetas de resumen.
+  - Gráficas.
+  - Tabla.
+  - Vista responsiva.
+*/
+
+
+/*
+  ============================================================
+  TOOLBAR
+  ============================================================
+
+  position: sticky mantiene la barra visible en la parte superior
+  cuando el usuario hace scroll.
+*/
+
+.toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+
+/*
+  ============================================================
+  CONTENEDOR PRINCIPAL
+  ============================================================
+
+  max-width evita que el contenido se estire demasiado en pantallas grandes.
+
+  margin: 0 auto centra el contenido horizontalmente.
+*/
+
+.dashboard-container {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+
+/*
+  ============================================================
+  ENCABEZADO
+  ============================================================
+
+  Se usa flexbox para colocar el título a la izquierda
+  y los botones a la derecha.
+*/
+
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  align-items: center;
+  margin-bottom: 24px;
+
+  h1 {
+    margin: 0;
+    font-size: 32px;
+    font-weight: 700;
+  }
+
+  p {
+    margin: 8px 0 0;
+    color: #666;
+    font-size: 16px;
+  }
+}
+
+
+/*
+  ============================================================
+  BOTONES DE ACCIÓN
+  ============================================================
+
+  flex-wrap permite que los botones bajen de línea en pantallas pequeñas.
+*/
+
+.actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+
+  button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+}
+
+
+/*
+  ============================================================
+  TARJETA DE ERROR
+  ============================================================
+
+  Se muestra cuando falla alguna petición al backend.
+*/
+
+.error-card {
+  margin-bottom: 24px;
+  background: #ffebee;
+  color: #b71c1c;
+}
+
+
+/*
+  ============================================================
+  GRID DE RESUMEN
+  ============================================================
+
+  Crea cuatro columnas para las tarjetas principales.
+*/
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+
+/*
+  ============================================================
+  TARJETAS DE RESUMEN
+  ============================================================
+
+  Estas tarjetas muestran:
+  - Total de eventos.
+  - Detecciones.
+  - No detectados.
+  - Porcentaje.
+*/
+
+.summary-card {
+  border-radius: 18px;
+
+  mat-card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-top: 12px;
+  }
+
+  strong {
+    font-size: 36px;
+    line-height: 1;
+  }
+
+  span {
+    color: #666;
+  }
+}
+
+
+/*
+  Bordes de color para diferenciar visualmente las tarjetas.
+*/
+
+.summary-card.success {
+  border-left: 6px solid #2e7d32;
+}
+
+.summary-card.neutral {
+  border-left: 6px solid #546e7a;
+}
+
+.summary-card.percent {
+  border-left: 6px solid #1565c0;
+}
+
+
+/*
+  ============================================================
+  GRID DE GRÁFICAS
+  ============================================================
+
+  Se muestran dos columnas.
+
+  La gráfica de línea ocupa todo el ancho.
+*/
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(280px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.chart-card {
+  border-radius: 18px;
+}
+
+.chart-wide {
+  grid-column: 1 / -1;
+}
+
+
+/*
+  ============================================================
+  CONTENEDORES DE GRÁFICAS
+  ============================================================
+
+  Chart.js necesita que el contenedor tenga una altura definida
+  cuando se usa maintainAspectRatio: false.
+*/
+
+.chart-container {
+  position: relative;
+  height: 320px;
+  width: 100%;
+}
+
+.chart-container.large {
+  height: 420px;
+}
+
+
+/*
+  ============================================================
+  TABLA
+  ============================================================
+*/
+
+.table-card {
+  border-radius: 18px;
+}
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.events-table {
+  width: 100%;
+  min-width: 760px;
+}
+
+
+/*
+  ============================================================
+  INDICADOR DE CARGA
+  ============================================================
+*/
+
+.loading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  color: #555;
+}
+
+
+/*
+  ============================================================
+  CHIPS DE ESTADO
+  ============================================================
+
+  Se usan para mostrar visualmente si hubo detección o no.
+*/
+
+.chip-detectado {
+  background: #c8e6c9 !important;
+  color: #1b5e20 !important;
+}
+
+.chip-no-detectado {
+  background: #eceff1 !important;
+  color: #263238 !important;
+}
+
+
+/*
+  ============================================================
+  ESTADO VACÍO
+  ============================================================
+
+  Mensaje que aparece cuando aún no hay eventos registrados.
+*/
+
+.empty-state {
+  padding: 32px;
+  text-align: center;
+  color: #777;
+  font-size: 16px;
+}
+
+
+/*
+  ============================================================
+  DISEÑO RESPONSIVO
+  ============================================================
+
+  Cuando la pantalla es menor a 900px:
+  - El encabezado se acomoda en columna.
+  - Las tarjetas pasan a dos columnas.
+  - Las gráficas pasan a una columna.
+*/
+
+@media (max-width: 900px) {
+  .header-section {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .summary-grid {
+    grid-template-columns: repeat(2, minmax(160px, 1fr));
+  }
+
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/*
+  Cuando la pantalla es menor a 600px:
+  - Se reduce el padding.
+  - Las tarjetas pasan a una columna.
+  - Se reduce el tamaño del título.
+*/
+
+@media (max-width: 600px) {
+  .dashboard-container {
+    padding: 16px;
+  }
+
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .header-section h1 {
+    font-size: 26px;
+  }
+
+  .chart-container,
+  .chart-container.large {
+    height: 300px;
+  }
+}

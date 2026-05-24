@@ -1,0 +1,314 @@
+<!--
+  Pantalla de administración de categorías.
+-->
+
+<section class="categories-admin-page">
+  <!-- Encabezado -->
+  <header class="categories-admin-page__header">
+    <div>
+      <h1>Categorías</h1>
+      <p>
+        Administre las categorías que serán usadas para clasificar productos.
+      </p>
+    </div>
+
+    <button
+      mat-stroked-button
+      type="button"
+      (click)="loadCategories()"
+      [disabled]="loading() || processing()"
+    >
+      <mat-icon>refresh</mat-icon>
+      Actualizar
+    </button>
+  </header>
+
+  <!-- Resumen -->
+  <section class="categories-admin-page__summary">
+    <mat-card>
+      <mat-icon>category</mat-icon>
+      <span>Total</span>
+      <strong>{{ totalCategories() }}</strong>
+    </mat-card>
+
+    <mat-card>
+      <mat-icon>check_circle</mat-icon>
+      <span>Activas</span>
+      <strong>{{ totalActiveCategories() }}</strong>
+    </mat-card>
+
+    <mat-card>
+      <mat-icon>block</mat-icon>
+      <span>Inactivas</span>
+      <strong>{{ totalInactiveCategories() }}</strong>
+    </mat-card>
+  </section>
+
+  <!-- Error -->
+  @if (errorMessage()) {
+    <div class="categories-admin-page__error">
+      {{ errorMessage() }}
+    </div>
+  }
+
+  <!-- Cargando -->
+  @if (loading()) {
+    <mat-card class="categories-admin-page__loading">
+      <mat-progress-spinner
+        mode="indeterminate"
+        diameter="42"
+      />
+
+      <p>Cargando categorías...</p>
+    </mat-card>
+  }
+
+  <!-- Contenido -->
+  @if (!loading()) {
+    <section class="categories-admin-page__content">
+      <!-- Formulario -->
+      <mat-card class="category-form-card">
+        <header class="category-form-card__header">
+          <div>
+            <span>
+              {{ isEditing() ? 'Edición' : 'Nueva categoría' }}
+            </span>
+
+            <h2>
+              {{ isEditing() ? 'Editar categoría' : 'Registrar categoría' }}
+            </h2>
+          </div>
+
+          @if (isEditing()) {
+            <button
+              mat-icon-button
+              type="button"
+              aria-label="Cancelar edición"
+              (click)="resetForm()"
+              [disabled]="processing()"
+            >
+              <mat-icon>close</mat-icon>
+            </button>
+          }
+        </header>
+
+        <mat-divider />
+
+        <section class="category-form-card__body">
+          <mat-form-field appearance="outline">
+            <mat-label>Nombre</mat-label>
+
+            <input
+              matInput
+              type="text"
+              placeholder="Ej. Bebidas calientes"
+              [ngModel]="formName()"
+              (ngModelChange)="formName.set($event)"
+              name="categoryName"
+              [disabled]="processing()"
+            />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Descripción</mat-label>
+
+            <textarea
+              matInput
+              rows="4"
+              placeholder="Descripción de la categoría"
+              [ngModel]="formDescription()"
+              (ngModelChange)="formDescription.set($event)"
+              name="categoryDescription"
+              [disabled]="processing()"
+            ></textarea>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Estado</mat-label>
+
+            <mat-select
+              [ngModel]="formStatus()"
+              (ngModelChange)="formStatus.set($event)"
+              name="categoryStatus"
+              [disabled]="processing()"
+            >
+              <mat-option value="ACTIVE">
+                Activa
+              </mat-option>
+
+              <mat-option value="INACTIVE">
+                Inactiva
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </section>
+
+        <mat-divider />
+
+        <footer class="category-form-card__actions">
+          <button
+            mat-flat-button
+            color="primary"
+            type="button"
+            (click)="saveCategory()"
+            [disabled]="processing()"
+          >
+            <mat-icon>
+              {{ processing() ? 'hourglass_empty' : 'save' }}
+            </mat-icon>
+
+            {{ isEditing() ? 'Actualizar categoría' : 'Guardar categoría' }}
+          </button>
+
+          <button
+            mat-stroked-button
+            type="button"
+            (click)="resetForm()"
+            [disabled]="processing()"
+          >
+            <mat-icon>restart_alt</mat-icon>
+            Limpiar
+          </button>
+        </footer>
+      </mat-card>
+
+      <!-- Listado -->
+      <mat-card class="categories-list-card">
+        <header class="categories-list-card__header">
+          <div>
+            <h2>Listado de categorías</h2>
+            <p>
+              Busque, edite, active o desactive categorías registradas.
+            </p>
+          </div>
+        </header>
+
+        <section class="categories-list-card__filters">
+          <mat-form-field appearance="outline">
+            <mat-label>Buscar</mat-label>
+
+            <input
+              matInput
+              type="text"
+              placeholder="Buscar por nombre o descripción"
+              [ngModel]="searchText()"
+              (ngModelChange)="searchText.set($event)"
+              name="categorySearch"
+            />
+
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Estado</mat-label>
+
+            <mat-select
+              [ngModel]="statusFilter()"
+              (ngModelChange)="statusFilter.set($event)"
+              name="categoryStatusFilter"
+            >
+              <mat-option value="ALL">
+                Todas
+              </mat-option>
+
+              <mat-option value="ACTIVE">
+                Activas
+              </mat-option>
+
+              <mat-option value="INACTIVE">
+                Inactivas
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <button
+            mat-stroked-button
+            type="button"
+            (click)="clearFilters()"
+          >
+            <mat-icon>filter_alt_off</mat-icon>
+            Limpiar filtros
+          </button>
+        </section>
+
+        <mat-divider />
+
+        @if (filteredCategories().length === 0) {
+          <div class="categories-list-card__empty">
+            <mat-icon>category</mat-icon>
+
+            <strong>No hay categorías para mostrar</strong>
+
+            <p>
+              Registre una categoría nueva o ajuste los filtros de búsqueda.
+            </p>
+          </div>
+        } @else {
+          <section class="categories-list">
+            @for (category of filteredCategories(); track category.id) {
+              <article class="category-item">
+                <div class="category-item__main">
+                  <div class="category-item__icon">
+                    <mat-icon>category</mat-icon>
+                  </div>
+
+                  <div>
+                    <h3>{{ category.name }}</h3>
+
+                    <p>
+                      {{ category.description || 'Sin descripción' }}
+                    </p>
+
+                    <mat-chip
+                      [class.category-chip--active]="isCategoryActive(category)"
+                      [class.category-chip--inactive]="!isCategoryActive(category)"
+                    >
+                      <mat-icon>{{ getStatusIcon(category) }}</mat-icon>
+                      {{ getStatusLabel(category) }}
+                    </mat-chip>
+                  </div>
+                </div>
+
+                <div class="category-item__actions">
+                  <button
+                    mat-stroked-button
+                    type="button"
+                    (click)="editCategory(category)"
+                    [disabled]="processing()"
+                  >
+                    <mat-icon>edit</mat-icon>
+                    Editar
+                  </button>
+
+                  <button
+                    mat-stroked-button
+                    type="button"
+                    (click)="toggleCategoryStatus(category)"
+                    [disabled]="processing()"
+                  >
+                    <mat-icon>
+                      {{ isCategoryActive(category) ? 'block' : 'check_circle' }}
+                    </mat-icon>
+
+                    {{ isCategoryActive(category) ? 'Desactivar' : 'Activar' }}
+                  </button>
+
+                  <button
+                    mat-stroked-button
+                    type="button"
+                    class="category-item__delete-button"
+                    (click)="deleteCategory(category)"
+                    [disabled]="processing()"
+                  >
+                    <mat-icon>delete</mat-icon>
+                    Eliminar
+                  </button>
+                </div>
+              </article>
+            }
+          </section>
+        }
+      </mat-card>
+    </section>
+  }
+</section>
